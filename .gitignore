@@ -1,0 +1,14 @@
+# python
+venv/
+__pycache__/
+*.pyc
+.env
+
+# node (for when frontend lands)
+node_modules/
+.next/
+.env.local
+
+# os
+.DS_Store
+Thumbs.db
