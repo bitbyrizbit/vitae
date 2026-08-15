@@ -183,34 +183,40 @@ export default function RegistryPage() {
                   </div>
 
                   {/* Scores & Status */}
-                  <div className="flex items-center gap-6 shrink-0 md:flex-1 justify-end border-t md:border-t-0 border-rule pt-4 md:pt-0 px-4">
+                  <div className="flex items-center gap-5 shrink-0 md:w-[260px] justify-between border-t md:border-t-0 border-rule pt-4 md:pt-0 pl-4 border-l-0 md:border-l">
                     <div className="text-right">
                       <p className="text-[11px] text-text-tertiary font-medium mb-1">API Score</p>
-                      <p className="text-xl font-mono text-brown">{r.total_api_score}</p>
+                      <p className="text-xl font-mono text-brown leading-none">{r.total_api_score}</p>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
+                    <div className="flex flex-col items-end gap-1.5 w-[90px]">
                       <StatusBadge status={r.eligible_for_cas} />
                       <StatusBadge status={r.status} />
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex flex-wrap items-center justify-end gap-2 shrink-0 border-t md:border-t-0 border-rule pt-4 md:pt-0">
-                    <Button variant="secondary" size="sm" onClick={() => handleDownload(r.id, r.employee_code, r.academic_year, true)}>
-                      Preview
+                  <div className="flex items-center justify-end gap-2 shrink-0 md:w-[140px] border-t md:border-t-0 border-rule pt-4 md:pt-0">
+                    <Button variant="secondary" size="icon" title="Preview PDF" onClick={() => handleDownload(r.id, r.employee_code, r.academic_year, true)}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                     </Button>
-                    <Button variant="secondary" size="sm" onClick={() => handleDownload(r.id, r.employee_code, r.academic_year, false)}>
-                      Download
+                    <Button variant="secondary" size="icon" title="Download PDF" onClick={() => handleDownload(r.id, r.employee_code, r.academic_year, false)}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                     </Button>
                     
                     {role === "hod" && r.status === "submitted" && (
-                      <Button size="sm" onClick={() => handleApprove(r.id, "hod_approved")} className="bg-sage hover:bg-sage">Approve</Button>
+                      <Button size="icon" title="Approve" onClick={() => handleApprove(r.id, "hod_approved")} className="bg-sage hover:bg-sage">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </Button>
                     )}
                     {role === "iqac" && r.status === "hod_approved" && (
-                      <Button size="sm" onClick={() => handleApprove(r.id, "iqac_approved")} className="bg-sage hover:bg-sage">Approve</Button>
+                      <Button size="icon" title="Approve" onClick={() => handleApprove(r.id, "iqac_approved")} className="bg-sage hover:bg-sage">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </Button>
                     )}
                     {["hod", "iqac", "admin"].includes(role || "") && r.status !== "rejected" && (
-                      <Button variant="danger" size="sm" onClick={() => setRejectTarget(r.id)}>Reject</Button>
+                      <Button variant="danger" size="icon" title="Reject" onClick={() => setRejectTarget(r.id)}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </Button>
                     )}
                   </div>
 

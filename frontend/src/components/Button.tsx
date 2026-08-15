@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes } from "react";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "secondary" | "ghost" | "danger";
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "icon";
   loading?: boolean;
 };
 
@@ -19,8 +19,9 @@ export function Button({
     "inline-flex items-center justify-center font-medium transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]";
 
   const sizes = {
-    sm: "px-4 py-1.5 text-sm",
-    md: "px-6 py-2.5 text-[15px]",
+    sm: "px-4 py-1.5 text-[13px]",
+    md: "px-6 py-2.5 text-[14px]",
+    icon: "p-1.5 text-sm w-8 h-8 rounded-[4px]",
   };
 
   const variants = {
