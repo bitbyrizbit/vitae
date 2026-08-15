@@ -74,15 +74,16 @@ export default function RegistryPage() {
     try {
       const res = await api.get(`/admin/appraisals/${id}/pdf`, { responseType: "blob" });
       const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+      const link = document.createElement("a");
+      link.href = url;
       if (preview) {
-        window.open(url, "_blank");
+        link.setAttribute("target", "_blank");
       } else {
-        const link = document.createElement("a");
-        link.href = url;
         link.setAttribute("download", `${employeeCode}_${year}_appraisal.pdf`);
-        document.body.appendChild(link);
-        link.click();
       }
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       setTimeout(() => window.URL.revokeObjectURL(url), 1000);
     } catch { addToast("Failed to fetch PDF", "error"); }
   }

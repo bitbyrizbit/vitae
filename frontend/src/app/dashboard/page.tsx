@@ -231,15 +231,16 @@ export default function DashboardPage() {
     try {
       const res = await api.get(`/faculty/me/appraisal/${ACADEMIC_YEAR}/pdf`, { responseType: "blob" });
       const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+      const link = document.createElement("a");
+      link.href = url;
       if (preview) {
-        window.open(url, "_blank");
+        link.setAttribute("target", "_blank");
       } else {
-        const link = document.createElement("a");
-        link.href = url;
         link.setAttribute("download", `appraisal_${ACADEMIC_YEAR}.pdf`);
-        document.body.appendChild(link);
-        link.click();
       }
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       setTimeout(() => window.URL.revokeObjectURL(url), 1000);
     } catch { addToast("Failed to fetch PDF", "error"); }
   }
@@ -456,9 +457,8 @@ export default function DashboardPage() {
               step="0.1"
               value={pubForm.claimed_score} 
               onChange={(e) => setPubForm({ ...pubForm, claimed_score: e.target.value })} 
-              placeholder={`System recommendation: ${computedPubScore} pts`}
+              placeholder="Optional"
             />
-            <p className="text-[12px] text-text-tertiary mt-1">Leave blank to use the system recommended score.</p>
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-rule mt-2">
             <Button variant="ghost" type="button" onClick={() => setPubModalOpen(false)}>Cancel</Button>
@@ -500,9 +500,8 @@ export default function DashboardPage() {
               step="0.1"
               value={actForm.claimed_score} 
               onChange={(e) => setActForm({ ...actForm, claimed_score: e.target.value })} 
-              placeholder={`System recommendation: ${computedActScore} pts`}
+              placeholder="Optional"
             />
-            <p className="text-[12px] text-text-tertiary mt-1">Leave blank to use the system recommended score.</p>
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-rule mt-2">
             <Button variant="ghost" type="button" onClick={() => setActModalOpen(false)}>Cancel</Button>
