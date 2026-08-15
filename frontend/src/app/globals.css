@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f7f4ec;
+  --color-surface: #fcfaf5;
+  --color-ink: #1c1a16;
+  --color-ink-soft: #55503f;
+  --color-border: #e4dfd3;
+
+  --color-maroon: #6e2a2a;
+  --color-maroon-dark: #521f1f;
+  --color-forest: #3d5a40;
+  --color-ochre: #a67c2e;
+  --color-brick: #9c3b3b;
+
+  --font-serif: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --radius-sharp: 2px;
+}
+
+html {
+  background-color: var(--color-paper);
+}
+
+body {
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+::selection {
+  background-color: var(--color-maroon);
+  color: var(--color-paper);
+}
+
+/* registry table styling - real gridlines, not zebra stripes */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid var(--color-border);
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 13px;
+}
+
+th {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-soft);
+  background-color: var(--color-surface);
+}
+
+/* left-edge rule for stacked registry sections, instead of card shadows */
+.registry-section {
+  border-left: 2px solid var(--color-maroon);
+  padding-left: 20px;
+}
+
+input, select, textarea {
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-sharp);
+  padding: 8px 12px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--color-ink);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-maroon);
+}
+
+button {
+  border-radius: var(--radius-sharp);
+  font-family: var(--font-sans);
+}
