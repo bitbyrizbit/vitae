@@ -90,6 +90,23 @@ class AppraisalOut(BaseModel):
     class Config:
         from_attributes = True
 
+class AdminAppraisalOut(BaseModel):
+    id: int
+    faculty_id: int
+    faculty_name: str
+    employee_code: str
+    department: str
+    academic_year: str
+    category_i_score: float
+    category_ii_score: float
+    category_iii_score: float
+    total_api_score: float
+    eligible_for_cas: str
+    status: str
+    submitted_at: Optional[datetime] = None
 
+    class Config:
+        
+        from_attributes = True
 class ScholarLinkRequest(BaseModel):
     scholar_profile_id: str

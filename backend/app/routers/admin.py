@@ -8,7 +8,7 @@ from app.models.user import User
 from app.models.publication import Publication
 from app.models.activity import Activity
 from app.models.appraisal import Appraisal
-from app.schemas import AppraisalOut, UserOut
+from app.schemas import AdminAppraisalOut, UserOut
 from app.services.pdf_generator import build_appraisal_pdf
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 ADMIN_ROLES = ("admin", "hod", "iqac")
 
 
-@router.get("/appraisals", response_model=list[AppraisalOut])
+@router.get("/appraisals", response_model=list[AdminAppraisalOut])
 def list_all_appraisals(
     sort_by: str = Query("submitted_at", pattern="^(name|employee_code|submitted_at|total_api_score)$"),
     order: str = Query("desc", pattern="^(asc|desc)$"),
@@ -24,7 +24,7 @@ def list_all_appraisals(
     user=Depends(require_role(*ADMIN_ROLES)),
     db: Session = Depends(get_db),
 ):
-    query = db.query(Appraisal).join(User, Appraisal.faculty_id == User.id)
+    query = db.query(Appraisal, User).join(User, Appraisal.faculty_id == User.id)
 
     if department:
         query = query.filter(User.department == department)
@@ -39,7 +39,26 @@ def list_all_appraisals(
         column = Appraisal.submitted_at
 
     query = query.order_by(column.desc() if order == "desc" else column.asc())
-    return query.all()
+    rows = query.all()
+
+    return [
+        AdminAppraisalOut(
+            id=appraisal.id,
+            faculty_id=appraisal.faculty_id,
+            faculty_name=faculty.name,
+            employee_code=faculty.employee_code,
+            department=faculty.department,
+            academic_year=appraisal.academic_year,
+            category_i_score=appraisal.category_i_score,
+            category_ii_score=appraisal.category_ii_score,
+            category_iii_score=appraisal.category_iii_score,
+            total_api_score=appraisal.total_api_score,
+            eligible_for_cas=appraisal.eligible_for_cas,
+            status=appraisal.status,
+            submitted_at=appraisal.submitted_at,
+        )
+        for appraisal, faculty in rows
+    ]
 
 
 @router.get("/faculty", response_model=list[UserOut])
