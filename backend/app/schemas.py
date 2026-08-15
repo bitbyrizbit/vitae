@@ -48,6 +48,7 @@ class PublicationCreate(BaseModel):
     pub_type: str = "journal"
     is_scopus_or_wos: bool = False
     is_ugc_care: bool = False
+    claimed_score: Optional[float] = None
 
 
 class PublicationOut(PublicationCreate):
@@ -68,6 +69,7 @@ class ActivityCreate(BaseModel):
     role: Optional[str] = None
     activity_date: Optional[date] = None
     proof_url: Optional[str] = None
+    claimed_score: Optional[float] = None
 
 
 class ActivityOut(ActivityCreate):

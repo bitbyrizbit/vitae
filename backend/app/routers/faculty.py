@@ -38,7 +38,7 @@ def add_publication(payload: PublicationCreate, user: User = Depends(get_current
         is_scopus_or_wos=payload.is_scopus_or_wos,
         is_ugc_care=payload.is_ugc_care,
         source="manual",
-        api_score=score_publication(payload.pub_type, payload.is_scopus_or_wos, payload.citation_count),
+        api_score=payload.claimed_score if payload.claimed_score is not None else score_publication(payload.pub_type, payload.is_scopus_or_wos, payload.citation_count),
     )
     db.add(pub)
     db.commit()
@@ -103,7 +103,7 @@ def add_activity(payload: ActivityCreate, user: User = Depends(get_current_user)
         role=payload.role,
         activity_date=payload.activity_date,
         proof_url=payload.proof_url,
-        api_score=score_activity(payload.activity_type),
+        api_score=payload.claimed_score if payload.claimed_score is not None else score_activity(payload.activity_type),
     )
     db.add(activity)
     db.commit()

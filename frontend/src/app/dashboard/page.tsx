@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { useSession, useToast } from "@/lib/store";
@@ -78,15 +78,38 @@ export default function DashboardPage() {
   const [pubModalOpen, setPubModalOpen] = useState(false);
   const [actModalOpen, setActModalOpen] = useState(false);
 
-  // forms
   const [pubForm, setPubForm] = useState({
     title: "", journal_or_conference: "", year: "", citation_count: "0",
     pub_type: "journal", is_scopus_or_wos: false, is_ugc_care: false,
+    claimed_score: "",
   });
 
   const [actForm, setActForm] = useState({
     activity_type: "seminar_attended", title: "", activity_date: "", role: "", description: "",
+    claimed_score: "",
   });
+
+  const computedPubScore = useMemo(() => {
+    const points: Record<string, number> = {
+      journal: 15, conference: 10, book_chapter: 5, book_authored: 20,
+      book_edited: 10, patent_national: 10, patent_international: 15,
+    };
+    let base = points[pubForm.pub_type] || 10;
+    if (pubForm.is_scopus_or_wos) base += 5;
+    const citations = parseInt(pubForm.citation_count) || 0;
+    base += Math.min(citations * 0.1, 5);
+    return base;
+  }, [pubForm]);
+
+  const computedActScore = useMemo(() => {
+    const points: Record<string, number> = {
+      seminar_attended: 5, seminar_organized: 10, workshop_attended: 5, workshop_organized: 10,
+      fdp_attended: 10, fdp_organized: 15, guest_lecture: 5, invited_talk: 10,
+      project_pi_major: 20, project_pi_minor: 10, project_coinvestigator: 8,
+      committee_member: 3, committee_chair: 5, teaching_course: 10,
+    };
+    return points[actForm.activity_type] || 0;
+  }, [actForm]);
 
   /* ------------------------------------------------------------ auth */
 
@@ -149,6 +172,7 @@ export default function DashboardPage() {
         ...pubForm,
         year: pubForm.year ? parseInt(pubForm.year) : null,
         citation_count: parseInt(pubForm.citation_count) || 0,
+        claimed_score: pubForm.claimed_score.trim() ? parseFloat(pubForm.claimed_score) : computedPubScore,
       });
       setPubModalOpen(false);
       addToast("Publication added", "success");
@@ -163,6 +187,7 @@ export default function DashboardPage() {
         ...actForm,
         activity_date: actForm.activity_date || null,
         description: actForm.description || null,
+        claimed_score: actForm.claimed_score.trim() ? parseFloat(actForm.claimed_score) : computedActScore,
       });
       setActModalOpen(false);
       addToast("Activity logged", "success");
@@ -424,6 +449,17 @@ export default function DashboardPage() {
               UGC care listed
             </label>
           </div>
+          <div className="pt-4 border-t border-rule mt-2">
+            <label className="block text-[13px] font-medium text-text-secondary mb-2">Claimed API Score (Self-assessed)</label>
+            <input 
+              type="number" 
+              step="0.1"
+              value={pubForm.claimed_score} 
+              onChange={(e) => setPubForm({ ...pubForm, claimed_score: e.target.value })} 
+              placeholder={`System recommendation: ${computedPubScore} pts`}
+            />
+            <p className="text-[12px] text-text-tertiary mt-1">Leave blank to use the system recommended score.</p>
+          </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-rule mt-2">
             <Button variant="ghost" type="button" onClick={() => setPubModalOpen(false)}>Cancel</Button>
             <Button type="submit">Add publication</Button>
@@ -456,6 +492,17 @@ export default function DashboardPage() {
           <div>
             <label className="block text-[13px] font-medium text-text-secondary mb-2">Description (Optional)</label>
             <textarea rows={3} value={actForm.description} onChange={(e) => setActForm({ ...actForm, description: e.target.value })} />
+          </div>
+          <div className="pt-4 border-t border-rule mt-2">
+            <label className="block text-[13px] font-medium text-text-secondary mb-2">Claimed API Score (Self-assessed)</label>
+            <input 
+              type="number" 
+              step="0.1"
+              value={actForm.claimed_score} 
+              onChange={(e) => setActForm({ ...actForm, claimed_score: e.target.value })} 
+              placeholder={`System recommendation: ${computedActScore} pts`}
+            />
+            <p className="text-[12px] text-text-tertiary mt-1">Leave blank to use the system recommended score.</p>
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-rule mt-2">
             <Button variant="ghost" type="button" onClick={() => setActModalOpen(false)}>Cancel</Button>
