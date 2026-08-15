@@ -15,8 +15,8 @@ import { EmptyState } from "@/components/EmptyState";
 /* ---------------------------------------------------------------- types */
 
 type FeedItem = 
-  | { type: "publication"; id: number; title: string; date_val: number; score: number; meta: string; submeta: string }
-  | { type: "activity"; id: number; title: string; date_val: number; score: number; meta: string; submeta: string };
+  | { type: "publication"; id: number; title: string; date_val: number; score: number; meta: string; submeta: string; raw: any }
+  | { type: "activity"; id: number; title: string; date_val: number; score: number; meta: string; submeta: string; raw: any };
 
 type Appraisal = {
   academic_year: string;
@@ -77,6 +77,8 @@ export default function DashboardPage() {
   // modal states
   const [pubModalOpen, setPubModalOpen] = useState(false);
   const [actModalOpen, setActModalOpen] = useState(false);
+  const [editingPubId, setEditingPubId] = useState<number | null>(null);
+  const [editingActId, setEditingActId] = useState<number | null>(null);
 
   const [pubForm, setPubForm] = useState({
     title: "", journal_or_conference: "", year: "", citation_count: "0",
@@ -139,7 +141,8 @@ export default function DashboardPage() {
         type: "publication", id: p.id, title: p.title,
         date_val: p.year || 0, score: p.api_score,
         meta: p.pub_type.replace(/_/g, " ").charAt(0).toUpperCase() + p.pub_type.replace(/_/g, " ").slice(1),
-        submeta: p.journal_or_conference || "Unknown venue"
+        submeta: p.journal_or_conference || "Unknown venue",
+        raw: p,
       }));
       
       const acts: FeedItem[] = actRes.data.map((a: any) => ({
@@ -147,7 +150,8 @@ export default function DashboardPage() {
         date_val: a.activity_date ? parseInt(a.activity_date.split("-")[0]) : 0,
         score: a.api_score,
         meta: a.activity_type.replace(/_/g, " ").charAt(0).toUpperCase() + a.activity_type.replace(/_/g, " ").slice(1),
-        submeta: a.activity_date || "No date"
+        submeta: a.activity_date || "No date",
+        raw: a,
       }));
 
       // Sort descending by date (year)
@@ -167,32 +171,78 @@ export default function DashboardPage() {
 
   async function handleAddPublication(e: React.FormEvent) {
     e.preventDefault();
+    const payload = {
+      ...pubForm,
+      year: pubForm.year ? parseInt(pubForm.year) : null,
+      citation_count: parseInt(pubForm.citation_count) || 0,
+      claimed_score: pubForm.claimed_score.trim() ? parseFloat(pubForm.claimed_score) : computedPubScore,
+    };
     try {
-      await api.post("/faculty/me/publications", {
-        ...pubForm,
-        year: pubForm.year ? parseInt(pubForm.year) : null,
-        citation_count: parseInt(pubForm.citation_count) || 0,
-        claimed_score: pubForm.claimed_score.trim() ? parseFloat(pubForm.claimed_score) : computedPubScore,
-      });
+      if (editingPubId) {
+        await api.put(`/faculty/me/publications/${editingPubId}`, payload);
+        addToast("Publication updated", "success");
+      } else {
+        await api.post("/faculty/me/publications", payload);
+        addToast("Publication added", "success");
+      }
       setPubModalOpen(false);
-      addToast("Publication added", "success");
+      setEditingPubId(null);
+      setPubForm({ title: "", journal_or_conference: "", year: "", citation_count: "0", pub_type: "journal", is_scopus_or_wos: false, is_ugc_care: false, claimed_score: "" });
       loadData();
-    } catch { addToast("Failed to add publication", "error"); }
+    } catch { addToast("Failed to save publication", "error"); }
+  }
+
+  function startEditPub(item: FeedItem) {
+    const r = item.raw;
+    setPubForm({
+      title: r.title || "",
+      journal_or_conference: r.journal_or_conference || "",
+      year: r.year ? String(r.year) : "",
+      citation_count: String(r.citation_count ?? 0),
+      pub_type: r.pub_type || "journal",
+      is_scopus_or_wos: r.is_scopus_or_wos ?? false,
+      is_ugc_care: r.is_ugc_care ?? false,
+      claimed_score: String(r.api_score ?? ""),
+    });
+    setEditingPubId(item.id);
+    setPubModalOpen(true);
   }
 
   async function handleAddActivity(e: React.FormEvent) {
     e.preventDefault();
+    const payload = {
+      ...actForm,
+      activity_date: actForm.activity_date || null,
+      description: actForm.description || null,
+      claimed_score: actForm.claimed_score.trim() ? parseFloat(actForm.claimed_score) : computedActScore,
+    };
     try {
-      await api.post("/faculty/me/activities", {
-        ...actForm,
-        activity_date: actForm.activity_date || null,
-        description: actForm.description || null,
-        claimed_score: actForm.claimed_score.trim() ? parseFloat(actForm.claimed_score) : computedActScore,
-      });
+      if (editingActId) {
+        await api.put(`/faculty/me/activities/${editingActId}`, payload);
+        addToast("Activity updated", "success");
+      } else {
+        await api.post("/faculty/me/activities", payload);
+        addToast("Activity logged", "success");
+      }
       setActModalOpen(false);
-      addToast("Activity logged", "success");
+      setEditingActId(null);
+      setActForm({ activity_type: "seminar_attended", title: "", activity_date: "", role: "", description: "", claimed_score: "" });
       loadData();
-    } catch { addToast("Failed to log activity", "error"); }
+    } catch { addToast("Failed to save activity", "error"); }
+  }
+
+  function startEditAct(item: FeedItem) {
+    const r = item.raw;
+    setActForm({
+      activity_type: r.activity_type || "seminar_attended",
+      title: r.title || "",
+      activity_date: r.activity_date || "",
+      role: r.role || "",
+      description: r.description || "",
+      claimed_score: String(r.api_score ?? ""),
+    });
+    setEditingActId(item.id);
+    setActModalOpen(true);
   }
 
   async function handleDelete(type: string, id: number) {
@@ -326,12 +376,22 @@ export default function DashboardPage() {
                           </span>
                         )}
                       </div>
-                      <button
-                        onClick={() => handleDelete(item.type, item.id)}
-                        className="text-[12px] text-text-ghost hover:text-coral transition-colors font-medium"
-                      >
-                        Remove
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => item.type === "publication" ? startEditPub(item) : startEditAct(item)}
+                          className="text-text-ghost hover:text-blue transition-colors"
+                          title="Edit"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item.type, item.id)}
+                          className="text-text-ghost hover:text-coral transition-colors"
+                          title="Remove"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -412,7 +472,7 @@ export default function DashboardPage() {
       </main>
 
       {/* Modals */}
-      <Modal open={pubModalOpen} onClose={() => setPubModalOpen(false)} title="Add a publication">
+      <Modal open={pubModalOpen} onClose={() => { setPubModalOpen(false); setEditingPubId(null); setPubForm({ title: "", journal_or_conference: "", year: "", citation_count: "0", pub_type: "journal", is_scopus_or_wos: false, is_ugc_care: false, claimed_score: "" }); }} title={editingPubId ? "Edit publication" : "Add a publication"}>
         <form onSubmit={handleAddPublication} className="space-y-5">
           <div>
             <label className="block text-[13px] font-medium text-text-secondary mb-2">Title</label>
@@ -470,12 +530,12 @@ export default function DashboardPage() {
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-rule mt-2">
             <Button variant="ghost" type="button" onClick={() => setPubModalOpen(false)}>Cancel</Button>
-            <Button type="submit">Add publication</Button>
+            <Button type="submit">{editingPubId ? "Save changes" : "Add publication"}</Button>
           </div>
         </form>
       </Modal>
 
-      <Modal open={actModalOpen} onClose={() => setActModalOpen(false)} title="Log an activity">
+      <Modal open={actModalOpen} onClose={() => { setActModalOpen(false); setEditingActId(null); setActForm({ activity_type: "seminar_attended", title: "", activity_date: "", role: "", description: "", claimed_score: "" }); }} title={editingActId ? "Edit activity" : "Log an activity"}>
         <form onSubmit={handleAddActivity} className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -521,7 +581,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-rule mt-2">
             <Button variant="ghost" type="button" onClick={() => setActModalOpen(false)}>Cancel</Button>
-            <Button type="submit">Log activity</Button>
+            <Button type="submit">{editingActId ? "Save changes" : "Log activity"}</Button>
           </div>
         </form>
       </Modal>

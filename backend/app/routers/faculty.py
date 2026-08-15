@@ -56,6 +56,24 @@ def delete_publication(pub_id: int, user: User = Depends(get_current_user), db: 
     return {"deleted": True}
 
 
+@router.put("/me/publications/{pub_id}", response_model=PublicationOut)
+def edit_publication(pub_id: int, payload: PublicationCreate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    pub = db.query(Publication).filter(Publication.id == pub_id, Publication.faculty_id == user.id).first()
+    if not pub:
+        raise HTTPException(status_code=404, detail="publication not found or access denied")
+    pub.title = payload.title
+    pub.journal_or_conference = payload.journal_or_conference
+    pub.year = payload.year
+    pub.citation_count = payload.citation_count
+    pub.pub_type = payload.pub_type
+    pub.is_scopus_or_wos = payload.is_scopus_or_wos
+    pub.is_ugc_care = payload.is_ugc_care
+    pub.api_score = payload.claimed_score if payload.claimed_score is not None else score_publication(payload.pub_type, payload.is_scopus_or_wos, payload.citation_count)
+    db.commit()
+    db.refresh(pub)
+    return pub
+
+
 @router.post("/me/scholar-link")
 def link_scholar_profile(payload: ScholarLinkRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     user.scholar_profile_id = payload.scholar_profile_id
@@ -119,6 +137,23 @@ def delete_activity(activity_id: int, user: User = Depends(get_current_user), db
     db.delete(activity)
     db.commit()
     return {"deleted": True}
+
+
+@router.put("/me/activities/{activity_id}", response_model=ActivityOut)
+def edit_activity(activity_id: int, payload: ActivityCreate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    activity = db.query(Activity).filter(Activity.id == activity_id, Activity.faculty_id == user.id).first()
+    if not activity:
+        raise HTTPException(status_code=404, detail="activity not found or access denied")
+    activity.activity_type = payload.activity_type
+    activity.title = payload.title
+    activity.description = payload.description
+    activity.role = payload.role
+    activity.activity_date = payload.activity_date
+    activity.proof_url = payload.proof_url
+    activity.api_score = payload.claimed_score if payload.claimed_score is not None else score_activity(payload.activity_type)
+    db.commit()
+    db.refresh(activity)
+    return activity
 
 
 @router.post("/me/appraisal/{academic_year}", response_model=AppraisalOut)
