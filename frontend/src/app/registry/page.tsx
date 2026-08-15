@@ -70,17 +70,21 @@ export default function RegistryPage() {
 
   /* ------------------------------------------------------------ actions */
 
-  async function handleDownload(id: number, employeeCode: string, year: string) {
+  async function handleDownload(id: number, employeeCode: string, year: string, preview: boolean) {
     try {
       const res = await api.get(`/admin/appraisals/${id}/pdf`, { responseType: "blob" });
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `${employeeCode}_${year}_appraisal.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      window.URL.revokeObjectURL(url);
-    } catch { addToast("Failed to download PDF", "error"); }
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+      if (preview) {
+        window.open(url, "_blank");
+      } else {
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `${employeeCode}_${year}_appraisal.pdf`);
+        document.body.appendChild(link);
+        link.click();
+      }
+      setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+    } catch { addToast("Failed to fetch PDF", "error"); }
   }
 
   async function handleApprove(id: number, decision: string) {
@@ -179,8 +183,8 @@ export default function RegistryPage() {
                   </div>
 
                   {/* Scores & Status */}
-                  <div className="flex items-center gap-6 shrink-0 md:w-[350px] justify-between border-t md:border-t-0 border-rule pt-4 md:pt-0">
-                    <div>
+                  <div className="flex items-center gap-6 shrink-0 md:flex-1 justify-end border-t md:border-t-0 border-rule pt-4 md:pt-0 px-4">
+                    <div className="text-right">
                       <p className="text-[11px] text-text-tertiary font-medium mb-1">API Score</p>
                       <p className="text-xl font-mono text-brown">{r.total_api_score}</p>
                     </div>
@@ -191,9 +195,12 @@ export default function RegistryPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center justify-end gap-3 shrink-0 md:w-[200px] border-t md:border-t-0 border-rule pt-4 md:pt-0">
-                    <Button variant="secondary" size="sm" onClick={() => handleDownload(r.id, r.employee_code, r.academic_year)}>
-                      View PDF
+                  <div className="flex flex-wrap items-center justify-end gap-2 shrink-0 border-t md:border-t-0 border-rule pt-4 md:pt-0">
+                    <Button variant="secondary" size="sm" onClick={() => handleDownload(r.id, r.employee_code, r.academic_year, true)}>
+                      Preview
+                    </Button>
+                    <Button variant="secondary" size="sm" onClick={() => handleDownload(r.id, r.employee_code, r.academic_year, false)}>
+                      Download
                     </Button>
                     
                     {role === "hod" && r.status === "submitted" && (

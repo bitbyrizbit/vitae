@@ -32,6 +32,7 @@ ACTIVITY_POINTS = {
     "project_coinvestigator": 8,
     "committee_member": 3,
     "committee_chair": 5,
+    "teaching_course": 10,
 }
 
 CAS_ELIGIBILITY_THRESHOLD = 120
@@ -67,7 +68,7 @@ def compute_appraisal_totals(publications: list, activities: list) -> dict:
     category_ii = sum(a.api_score for a in activities if a.activity_type in co_curricular_types)
     category_iii += sum(a.api_score for a in activities if a.activity_type in research_activity_types)
 
-    category_i = 0.0  # teaching load is self declared elsewhere, not derivable from logged data
+    category_i = sum(a.api_score for a in activities if a.activity_type == "teaching_course")
 
     total = round(category_i + category_ii + category_iii, 2)
 

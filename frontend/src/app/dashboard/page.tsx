@@ -43,6 +43,7 @@ const PUB_TYPES = [
 ];
 
 const ACTIVITY_TYPES = [
+  { value: "teaching_course", label: "Teaching course (Category I)" },
   { value: "seminar_attended", label: "Seminar attended" },
   { value: "seminar_organized", label: "Seminar organized" },
   { value: "workshop_attended", label: "Workshop attended" },
@@ -201,17 +202,21 @@ export default function DashboardPage() {
     setSubmitting(false);
   }
 
-  async function handleDownloadPdf() {
+  async function handleDownloadPdf(preview: boolean) {
     try {
       const res = await api.get(`/faculty/me/appraisal/${ACADEMIC_YEAR}/pdf`, { responseType: "blob" });
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `appraisal_${ACADEMIC_YEAR}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      window.URL.revokeObjectURL(url);
-    } catch { addToast("Failed to download PDF", "error"); }
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+      if (preview) {
+        window.open(url, "_blank");
+      } else {
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `appraisal_${ACADEMIC_YEAR}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+      }
+      setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+    } catch { addToast("Failed to fetch PDF", "error"); }
   }
 
   /* ------------------------------------------------------------ render */
@@ -363,9 +368,14 @@ export default function DashboardPage() {
                 {appraisal ? "Recalculate record" : "Submit appraisal"}
               </Button>
               {appraisal && (
-                <Button variant="secondary" onClick={handleDownloadPdf} className="w-full">
-                  Download PDF report
-                </Button>
+                <div className="flex gap-2 w-full">
+                  <Button variant="secondary" onClick={() => handleDownloadPdf(true)} className="flex-1 px-0">
+                    Preview PDF
+                  </Button>
+                  <Button variant="secondary" onClick={() => handleDownloadPdf(false)} className="flex-1 px-0">
+                    Download
+                  </Button>
+                </div>
               )}
             </div>
           </div>
