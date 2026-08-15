@@ -1,5 +1,9 @@
 import { create } from "zustand";
 
+/* ----------------------------------------------------------------
+   Session store - auth state + localStorage persistence
+   ---------------------------------------------------------------- */
+
 type Session = {
   token: string | null;
   role: string | null;
@@ -30,5 +34,35 @@ export const useSession = create<Session>((set) => ({
     const role = localStorage.getItem("vitae_role");
     const name = localStorage.getItem("vitae_name");
     if (token) set({ token, role, name });
+  },
+}));
+
+/* ----------------------------------------------------------------
+   Toast store - lightweight notification system
+   ---------------------------------------------------------------- */
+
+type Toast = {
+  id: string;
+  message: string;
+  type: "success" | "error" | "info";
+};
+
+type ToastStore = {
+  toasts: Toast[];
+  addToast: (message: string, type?: "success" | "error" | "info") => void;
+  removeToast: (id: string) => void;
+};
+
+export const useToast = create<ToastStore>((set) => ({
+  toasts: [],
+  addToast: (message, type = "info") => {
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    set((state) => ({ toasts: [...state.toasts, { id, message, type }] }));
+    setTimeout(() => {
+      set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
+    }, 4000);
+  },
+  removeToast: (id) => {
+    set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
   },
 }));

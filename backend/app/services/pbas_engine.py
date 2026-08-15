@@ -41,6 +41,10 @@ def score_publication(pub_type: str, is_indexed: bool, citation_count: int = 0) 
     key = pub_type
     if pub_type == "journal" and is_indexed:
         key = "journal_scopus_wos"
+    # fallback mappings for legacy/short pub_type values
+    fallback_map = {"book": "book_authored", "patent": "patent_national"}
+    if key not in PUBLICATION_POINTS and key in fallback_map:
+        key = fallback_map[key]
     base = PUBLICATION_POINTS.get(key, PUBLICATION_POINTS.get(pub_type, 0))
     citation_bonus = min(citation_count * 0.1, 5)
     return round(base + citation_bonus, 2)

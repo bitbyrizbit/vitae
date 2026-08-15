@@ -23,7 +23,7 @@ def build_appraisal_pdf(faculty, appraisal, publications, activities) -> bytes:
     info_table = Table([
         ["Name", faculty.name, "Employee Code", faculty.employee_code],
         ["Department", faculty.department, "Designation", faculty.designation],
-    ], colWidths=[70 * mm, 55 * mm, 30 * mm, 35 * mm])
+    ], colWidths=[45 * mm, 55 * mm, 35 * mm, 35 * mm])
     info_table.setStyle(TableStyle([
         ("FONTSIZE", (0, 0), (-1, -1), 9),
         ("TEXTCOLOR", (0, 0), (0, -1), colors.grey),
@@ -39,7 +39,7 @@ def build_appraisal_pdf(faculty, appraisal, publications, activities) -> bytes:
         ["II", "Co-curricular, extension and professional development", f"{appraisal.category_ii_score}"],
         ["III", "Research, publications and academic contributions", f"{appraisal.category_iii_score}"],
         ["", "Total API score", f"{appraisal.total_api_score}"],
-    ], colWidths=[20 * mm, 120 * mm, 30 * mm])
+    ], colWidths=[15 * mm, 110 * mm, 25 * mm])
     score_table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1a1a1a")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
@@ -60,7 +60,7 @@ def build_appraisal_pdf(faculty, appraisal, publications, activities) -> bytes:
         pub_rows = [["Title", "Venue", "Year", "Score"]]
         for p in publications:
             pub_rows.append([p.title, p.journal_or_conference or "-", str(p.year or "-"), f"{p.api_score}"])
-        pub_table = Table(pub_rows, colWidths=[75 * mm, 50 * mm, 15 * mm, 20 * mm])
+        pub_table = Table(pub_rows, colWidths=[65 * mm, 50 * mm, 15 * mm, 20 * mm])
         pub_table.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#f0f0f0")),
             ("FONTSIZE", (0, 0), (-1, -1), 8),
@@ -74,7 +74,7 @@ def build_appraisal_pdf(faculty, appraisal, publications, activities) -> bytes:
         act_rows = [["Title", "Type", "Date", "Score"]]
         for a in activities:
             act_rows.append([a.title, a.activity_type.replace("_", " "), str(a.activity_date or "-"), f"{a.api_score}"])
-        act_table = Table(act_rows, colWidths=[75 * mm, 40 * mm, 25 * mm, 20 * mm])
+        act_table = Table(act_rows, colWidths=[65 * mm, 40 * mm, 25 * mm, 20 * mm])
         act_table.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#f0f0f0")),
             ("FONTSIZE", (0, 0), (-1, -1), 8),
