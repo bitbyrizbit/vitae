@@ -10,10 +10,13 @@ type Props = {
 
 export function EmptyState({ message, action }: Props) {
   return (
-    <div className="py-16 flex flex-col items-center justify-center border border-dashed border-rule rounded-[3px]">
-      <p className="text-text-tertiary text-sm mb-4">{message}</p>
+    <div className="py-20 flex flex-col items-center justify-center border border-dashed border-rule-strong rounded-[4px] bg-surface-1/50">
+      <div className="w-12 h-12 rounded-full bg-surface-2 flex items-center justify-center mb-4">
+        <span className="text-text-ghost text-xl">/</span>
+      </div>
+      <p className="text-text-tertiary text-[15px] mb-5 font-medium">{message}</p>
       {action && (
-        <Button variant="secondary" size="sm" onClick={action.onClick}>
+        <Button variant="secondary" onClick={action.onClick}>
           {action.label}
         </Button>
       )}

@@ -35,7 +35,7 @@ export default function LoginPage() {
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { detail?: string } } })?.response?.data
-          ?.detail || "login failed, check your credentials";
+          ?.detail || "Login failed, please check your credentials";
       setError(message);
       setShaking(true);
       setTimeout(() => setShaking(false), 500);
@@ -45,71 +45,70 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-base flex flex-col">
-      <div className="h-[2px] bg-gold" />
+    <main className="min-h-screen bg-surface-2 flex items-center justify-center p-6">
+      <div className="w-full max-w-[400px] bg-surface-1 p-8 md:p-10 rounded-[4px] shadow-sm border border-rule animate-in">
+        
+        <Link href="/" className="inline-block mb-10">
+          <h1 className="text-3xl text-blue font-display tracking-tight hover:text-brown transition-colors">
+            Vitae
+          </h1>
+        </Link>
+        
+        <h2 className="text-xl text-text font-medium mb-1">Welcome back</h2>
+        <p className="text-sm text-text-tertiary mb-8">
+          Sign in to access your faculty dossier.
+        </p>
 
-      <div className="flex-1 flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-sm animate-in">
-          <Link href="/" className="inline-block mb-8">
-            <h1 className="text-3xl text-text font-display hover:text-gold transition-colors duration-200">
-              Vitae
-            </h1>
-          </Link>
-          <p className="font-mono text-[11px] text-text-tertiary mb-8">
-            sign in to your faculty record
-          </p>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-[13px] font-medium text-text-secondary mb-2">
+              Email address
+            </label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+            />
+          </div>
+          <div>
+            <label className="block text-[13px] font-medium text-text-secondary mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+            />
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-[12px] text-text-secondary mb-1.5">
-                email
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-              />
-            </div>
-            <div>
-              <label className="block text-[12px] text-text-secondary mb-1.5">
-                password
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-              />
-            </div>
+          {error && (
+            <p className={`text-coral text-[13px] font-medium ${shaking ? "animate-shake" : ""}`}>
+              {error}
+            </p>
+          )}
 
-            {error && (
-              <p
-                className={`text-coral text-sm ${shaking ? "animate-shake" : ""}`}
-              >
-                {error}
-              </p>
-            )}
+          <Button
+            type="submit"
+            disabled={loading}
+            loading={loading}
+            className="w-full mt-2"
+          >
+            {loading ? "Signing in..." : "Sign in"}
+          </Button>
+        </form>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              loading={loading}
-              className="w-full"
-            >
-              {loading ? "signing in..." : "sign in"}
-            </Button>
-          </form>
-
-          <p className="text-sm text-text-secondary mt-8">
-            new faculty member?{" "}
+        <div className="mt-10 pt-6 border-t border-rule text-center">
+          <p className="text-sm text-text-secondary">
+            New faculty member?{" "}
             <Link
               href="/register"
-              className="text-gold hover:text-gold-bright transition-colors duration-200"
+              className="font-medium text-brown hover:text-brown-dim transition-colors"
             >
-              register here
+              Register here
             </Link>
           </p>
         </div>

@@ -1,60 +1,62 @@
 @import "tailwindcss";
 
 /* ----------------------------------------------------------------
-   Vitae design system
-   Palette: warm dark, gold accent, stratified surfaces
-   Type: Instrument Serif / Figtree / Geist Mono
-   Philosophy: strata -- horizontal bands, ledger precision,
-   weighted numerics, editorial negative space
+   Vitae design system (Light, Editorial, Architectural)
+   Palette: Warm alabaster, deep yale blue, terracotta brown
+   Type: Fraunces / Outfit / Chivo Mono
+   Philosophy: Physical ledger, asymmetric balance, strict sentence case
    ---------------------------------------------------------------- */
 
 @theme {
-  /* surfaces - layered dark, from deep to elevated */
-  --color-base: #0c0c0e;
-  --color-surface-1: #131316;
-  --color-surface-2: #1a1a1f;
-  --color-surface-3: #222228;
-  --color-surface-4: #2c2c33;
+  /* surfaces */
+  --color-base: #FAF9F6;      /* Warm alabaster white */
+  --color-surface-1: #FFFFFF; /* Pure white */
+  --color-surface-2: #F2EFE9; /* Subdued beige for subtle contrast */
 
   /* borders / rules */
-  --color-rule: #2a2a30;
-  --color-rule-subtle: #1f1f24;
-  --color-rule-strong: #3a3a42;
+  --color-rule: #E5E0D8;
+  --color-rule-subtle: #F0EDE6;
+  --color-rule-strong: #D1C9BC;
 
-  /* text hierarchy - warm silvers, not pure white */
-  --color-text: #e8e5de;
-  --color-text-secondary: #9b978e;
-  --color-text-tertiary: #615e56;
-  --color-text-ghost: #3d3b36;
+  /* text hierarchy */
+  --color-text: #172542;           /* Deep ink/blue for primary text */
+  --color-text-secondary: #4A5568; /* Slate gray */
+  --color-text-tertiary: #718096;  /* Light slate */
+  --color-text-ghost: #A0AEC0;
 
-  /* accent - muted gold, not garish */
-  --color-gold: #c8a44e;
-  --color-gold-dim: #8a7235;
-  --color-gold-bright: #dbb85a;
+  /* brand / accents */
+  --color-blue: #1B3B6F;        /* Yale Blue - primary structural color */
+  --color-blue-dim: #2C5294;
+  
+  --color-brown: #9C5A33;       /* Terracotta/Leather Brown - action/emphasis */
+  --color-brown-dim: #B9764E;
+  --color-brown-light: #E8D3C5;
 
-  /* semantic */
-  --color-sage: #5f9b72;
-  --color-sage-dim: #3d6b4c;
-  --color-coral: #c4605a;
-  --color-coral-dim: #8a4340;
-  --color-sky: #6889b5;
-  --color-sky-dim: #4a6180;
+  /* semantic (muted, ink-like tones) */
+  --color-sage: #4B6F55;
+  --color-sage-bg: #E6EDE8;
+  
+  --color-coral: #9E3D3D;
+  --color-coral-bg: #F5E6E6;
+  
+  --color-sky: #4A6E94;
+  --color-sky-bg: #E8EEF2;
 
-  /* type stacks - resolved at runtime from next/font variables */
-  --font-display: var(--font-instrument-serif), Georgia, "Times New Roman", serif;
-  --font-body: var(--font-figtree), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-geist-mono), "SF Mono", "Cascadia Code", monospace;
+  /* type stacks */
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-outfit), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-chivo-mono), "SF Mono", "Cascadia Code", monospace;
 
-  /* radii */
-  --radius-sm: 3px;
-  --radius-md: 6px;
+  /* radii - crisp, architectural */
+  --radius-sm: 2px;
+  --radius-md: 4px;
 }
 
 /* ---------------------------------------------------------------- base */
 
 html {
   background-color: var(--color-base);
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
@@ -66,52 +68,62 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
   font-family: var(--font-display);
   font-weight: 400;
-  letter-spacing: -0.01em;
-  line-height: 1.15;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--color-blue);
 }
 
 ::selection {
-  background-color: var(--color-gold);
-  color: var(--color-base);
+  background-color: var(--color-brown-light);
+  color: var(--color-blue);
 }
 
 /* ---------------------------------------------------------------- scrollbar */
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--color-surface-1); }
-::-webkit-scrollbar-thumb { background: var(--color-rule-strong); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-text-ghost); }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-rule-strong); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-tertiary); }
+
+/* Hide scrollbar for the middle dossier feed */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
 
 /* ---------------------------------------------------------------- form elements */
 
 input, select, textarea {
-  background-color: var(--color-surface-2);
-  border: 1px solid var(--color-rule);
+  background-color: var(--color-surface-1);
+  border: 1px solid var(--color-rule-strong);
   border-radius: var(--radius-sm);
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: 14px;
   padding: 10px 14px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
   outline: none;
   width: 100%;
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: var(--color-gold);
-  box-shadow: 0 0 0 1px var(--color-gold-dim);
+  border-color: var(--color-brown);
+  box-shadow: 0 0 0 1px var(--color-brown-light);
 }
 
 input::placeholder, textarea::placeholder {
-  color: var(--color-text-tertiary);
+  color: var(--color-text-ghost);
 }
 
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='%23615e56' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='%23718096' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 36px;
@@ -121,72 +133,31 @@ input[type="checkbox"] {
   width: 16px;
   height: 16px;
   padding: 0;
-  border-radius: 3px;
-  accent-color: var(--color-gold);
+  border-radius: 2px;
+  accent-color: var(--color-brown);
   cursor: pointer;
-}
-
-/* ---------------------------------------------------------------- ledger tables */
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-th {
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 12px;
-  color: var(--color-text-tertiary);
-  text-align: left;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--color-rule);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-
-td {
-  font-size: 14px;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--color-rule-subtle);
-  color: var(--color-text-secondary);
-  vertical-align: middle;
-}
-
-tbody tr {
-  transition: background-color 0.15s ease;
-}
-
-tbody tr:hover td {
-  background-color: var(--color-surface-2);
-  color: var(--color-text);
 }
 
 /* ---------------------------------------------------------------- keyframes */
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.96); }
+  from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes toastSlideIn {
-  from { opacity: 0; transform: translateY(-14px) scale(0.95); }
+  from { opacity: 0; transform: translateY(14px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes toastSlideOut {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to { opacity: 0; transform: translateY(-14px) scale(0.95); }
 }
 
 @keyframes pulse-gentle {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  50% { opacity: 0.5; }
 }
 
 @keyframes spin {
@@ -202,19 +173,18 @@ tbody tr:hover td {
 /* ---------------------------------------------------------------- utility classes */
 
 .animate-in {
-  animation: fadeInUp 0.45s ease-out both;
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.stagger-1 { animation-delay: 0.06s; }
-.stagger-2 { animation-delay: 0.12s; }
-.stagger-3 { animation-delay: 0.18s; }
-.stagger-4 { animation-delay: 0.24s; }
-.stagger-5 { animation-delay: 0.30s; }
+.stagger-1 { animation-delay: 0.08s; }
+.stagger-2 { animation-delay: 0.16s; }
+.stagger-3 { animation-delay: 0.24s; }
+.stagger-4 { animation-delay: 0.32s; }
 
 .animate-shake {
   animation: shake 0.4s ease-out;
 }
 
 .animate-pulse-gentle {
-  animation: pulse-gentle 1.8s ease-in-out infinite;
+  animation: pulse-gentle 2s ease-in-out infinite;
 }

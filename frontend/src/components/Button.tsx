@@ -16,18 +16,18 @@ export function Button({
   ...rest
 }: Props) {
   const base =
-    "inline-flex items-center justify-center font-medium transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.97]";
+    "inline-flex items-center justify-center font-medium transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]";
 
   const sizes = {
-    sm: "px-3.5 py-1.5 text-xs",
-    md: "px-5 py-2.5 text-sm",
+    sm: "px-4 py-1.5 text-sm",
+    md: "px-6 py-2.5 text-[15px]",
   };
 
   const variants = {
-    primary: "bg-gold text-base hover:bg-gold-bright",
-    secondary: "border border-rule text-text-secondary hover:border-text-tertiary hover:text-text",
-    ghost: "text-text-secondary hover:text-text",
-    danger: "border border-coral-dim text-coral hover:bg-coral-dim/30",
+    primary: "bg-brown text-white hover:bg-brown-dim shadow-sm",
+    secondary: "bg-surface-1 border border-rule-strong text-text hover:border-brown hover:text-brown shadow-sm",
+    ghost: "text-text-secondary hover:text-brown",
+    danger: "border border-coral bg-coral-bg text-coral hover:bg-coral hover:text-white shadow-sm",
   };
 
   return (

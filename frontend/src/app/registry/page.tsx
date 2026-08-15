@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { useSession, useToast } from "@/lib/store";
 import { TopBar } from "@/components/TopBar";
-import { Section } from "@/components/Section";
 import { Button } from "@/components/Button";
 import { StatusBadge } from "@/components/StatusBadge";
-import { DataTable, Column } from "@/components/DataTable";
 import { Modal } from "@/components/Modal";
 import { ToastContainer } from "@/components/Toast";
+import { EmptyState } from "@/components/EmptyState";
 
 /* ---------------------------------------------------------------- types */
 
@@ -27,15 +26,6 @@ type AdminAppraisal = {
   submitted_at: string | null;
 };
 
-/* ---------------------------------------------------------------- constants */
-
-const SORT_OPTIONS = [
-  { value: "submitted_at", label: "submission date" },
-  { value: "name", label: "faculty name" },
-  { value: "employee_code", label: "employee code" },
-  { value: "total_api_score", label: "api score" },
-];
-
 /* ---------------------------------------------------------------- component */
 
 export default function RegistryPage() {
@@ -44,8 +34,6 @@ export default function RegistryPage() {
   const { addToast } = useToast();
 
   const [rows, setRows] = useState<AdminAppraisal[]>([]);
-  const [sortBy, setSortBy] = useState("submitted_at");
-  const [order, setOrder] = useState<"asc" | "desc">("desc");
   const [department, setDepartment] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -53,28 +41,19 @@ export default function RegistryPage() {
   const [rejectTarget, setRejectTarget] = useState<number | null>(null);
   const [rejectNote, setRejectNote] = useState("");
 
-  /* ------------------------------------------------------------ auth guard */
+  /* ------------------------------------------------------------ auth */
+
+  useEffect(() => { hydrate(); }, [hydrate]);
 
   useEffect(() => {
-    hydrate();
-  }, [hydrate]);
-
-  useEffect(() => {
-    const storedRole =
-      typeof window !== "undefined"
-        ? localStorage.getItem("vitae_role")
-        : null;
+    const storedRole = typeof window !== "undefined" ? localStorage.getItem("vitae_role") : null;
     if (storedRole && !["admin", "hod", "iqac"].includes(storedRole)) {
-      router.push("/dashboard");
-      return;
+      router.push("/dashboard"); return;
     }
-    if (!storedRole) {
-      router.push("/login");
-      return;
-    }
+    if (!storedRole) { router.push("/login"); return; }
     loadRows();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortBy, order, department]);
+  }, [department]);
 
   /* ------------------------------------------------------------ data */
 
@@ -82,54 +61,34 @@ export default function RegistryPage() {
     setLoading(true);
     try {
       const res = await api.get("/admin/appraisals", {
-        params: {
-          sort_by: sortBy,
-          order,
-          department: department || undefined,
-        },
+        params: { sort_by: "submitted_at", order: "desc", department: department || undefined },
       });
       setRows(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { console.error(err); }
+    setLoading(false);
   }
 
   /* ------------------------------------------------------------ actions */
 
-  async function handleDownload(
-    id: number,
-    employeeCode: string,
-    year: string
-  ) {
+  async function handleDownload(id: number, employeeCode: string, year: string) {
     try {
-      const res = await api.get(`/admin/appraisals/${id}/pdf`, {
-        responseType: "blob",
-      });
+      const res = await api.get(`/admin/appraisals/${id}/pdf`, { responseType: "blob" });
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", `${employeeCode}_${year}_appraisal.pdf`);
       document.body.appendChild(link);
       link.click();
-      link.remove();
       window.URL.revokeObjectURL(url);
-    } catch {
-      addToast("failed to download pdf", "error");
-    }
+    } catch { addToast("Failed to download PDF", "error"); }
   }
 
   async function handleApprove(id: number, decision: string) {
     try {
-      await api.patch(`/admin/appraisals/${id}/review`, null, {
-        params: { decision },
-      });
-      addToast("appraisal approved", "success");
+      await api.patch(`/admin/appraisals/${id}/review`, null, { params: { decision } });
+      addToast("Appraisal approved", "success");
       loadRows();
-    } catch {
-      addToast("failed to update appraisal", "error");
-    }
+    } catch { addToast("Failed to update appraisal", "error"); }
   }
 
   async function handleReject() {
@@ -138,230 +97,142 @@ export default function RegistryPage() {
       await api.patch(`/admin/appraisals/${rejectTarget}/review`, null, {
         params: { decision: "rejected", note: rejectNote || undefined },
       });
-      addToast("appraisal rejected", "info");
+      addToast("Appraisal rejected", "info");
       setRejectTarget(null);
       setRejectNote("");
       loadRows();
-    } catch {
-      addToast("failed to reject appraisal", "error");
-    }
+    } catch { addToast("Failed to reject appraisal", "error"); }
   }
 
   /* ------------------------------------------------------------ stats */
 
-  const eligibleCount = rows.filter(
-    (r) => r.eligible_for_cas === "eligible"
-  ).length;
-  const pendingCount = rows.filter(
-    (r) => r.status === "submitted" || r.status === "hod_approved"
-  ).length;
-
-  /* ------------------------------------------------------------ columns */
-
-  const columns: Column<AdminAppraisal>[] = [
-    {
-      key: "employee_code",
-      label: "code",
-      mono: true,
-      shrink: true,
-    },
-    { key: "faculty_name", label: "faculty" },
-    {
-      key: "department",
-      label: "department",
-      render: (r) => (
-        <span className="text-text-tertiary text-[13px]">{r.department}</span>
-      ),
-    },
-    { key: "academic_year", label: "year", mono: true, shrink: true },
-    {
-      key: "total_api_score",
-      label: "score",
-      mono: true,
-      shrink: true,
-      render: (r) => (
-        <span className="text-text font-mono">{r.total_api_score}</span>
-      ),
-    },
-    {
-      key: "eligible_for_cas",
-      label: "cas",
-      shrink: true,
-      render: (r) => <StatusBadge status={r.eligible_for_cas} />,
-    },
-    {
-      key: "status",
-      label: "review",
-      shrink: true,
-      render: (r) => <StatusBadge status={r.status} />,
-    },
-    {
-      key: "actions",
-      label: "",
-      shrink: true,
-      render: (r) => (
-        <div className="flex gap-3 items-center">
-          <button
-            onClick={() =>
-              handleDownload(r.id, r.employee_code, r.academic_year)
-            }
-            className="text-[11px] text-text-tertiary hover:text-gold transition-colors cursor-pointer"
-          >
-            pdf
-          </button>
-
-          {role === "hod" && r.status === "submitted" && (
-            <button
-              onClick={() => handleApprove(r.id, "hod_approved")}
-              className="text-[11px] text-sage hover:text-sage transition-colors cursor-pointer"
-            >
-              approve
-            </button>
-          )}
-
-          {role === "iqac" && r.status === "hod_approved" && (
-            <button
-              onClick={() => handleApprove(r.id, "iqac_approved")}
-              className="text-[11px] text-sage hover:text-sage transition-colors cursor-pointer"
-            >
-              approve
-            </button>
-          )}
-
-          {["hod", "iqac", "admin"].includes(role || "") &&
-            r.status !== "rejected" && (
-              <button
-                onClick={() => setRejectTarget(r.id)}
-                className="text-[11px] text-text-ghost hover:text-coral transition-colors cursor-pointer"
-              >
-                reject
-              </button>
-            )}
-        </div>
-      ),
-    },
-  ];
+  const eligibleCount = rows.filter((r) => r.eligible_for_cas === "eligible").length;
+  const pendingCount = rows.filter((r) => r.status === "submitted" || r.status === "hod_approved").length;
 
   /* ------------------------------------------------------------ render */
 
   return (
-    <main className="min-h-screen bg-base">
+    <div className="min-h-screen flex flex-col bg-base overflow-hidden">
       <TopBar />
       <ToastContainer />
 
-      <div className="max-w-6xl mx-auto px-6 md:px-8 py-10">
-        <Section
-          title="Faculty registry"
-          subtitle={`${rows.length} appraisal${rows.length !== 1 ? "s" : ""} on record`}
-        >
-          {/* stats strip */}
-          <div className="flex flex-wrap gap-6 mb-6 pb-6 border-b border-rule-subtle">
-            <div>
-              <p className="text-[11px] text-text-tertiary font-mono mb-0.5">
-                total
-              </p>
-              <p className="text-xl font-mono text-text">{rows.length}</p>
-            </div>
-            <div>
-              <p className="text-[11px] text-text-tertiary font-mono mb-0.5">
-                eligible
-              </p>
-              <p className="text-xl font-mono text-gold">{eligibleCount}</p>
-            </div>
-            <div>
-              <p className="text-[11px] text-text-tertiary font-mono mb-0.5">
-                pending review
-              </p>
-              <p className="text-xl font-mono text-sky">{pendingCount}</p>
-            </div>
-          </div>
-
-          {/* filters */}
-          <div className="flex flex-wrap gap-3 mb-6">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-auto flex-none"
-              style={{ width: "auto" }}
-            >
-              {SORT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  sort by {opt.label}
-                </option>
-              ))}
-            </select>
-            <select
-              value={order}
-              onChange={(e) => setOrder(e.target.value as "asc" | "desc")}
-              className="w-auto flex-none"
-              style={{ width: "auto" }}
-            >
-              <option value="desc">descending</option>
-              <option value="asc">ascending</option>
-            </select>
-            <input
-              placeholder="filter by department"
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              className="flex-1 min-w-[200px]"
-            />
-          </div>
-
-          {/* table */}
-          {loading ? (
-            <div className="py-12 text-center">
-              <p className="text-sm text-text-tertiary animate-pulse-gentle">
-                loading registry...
-              </p>
-            </div>
-          ) : (
-            <DataTable
-              columns={columns}
-              data={rows}
-              keyExtractor={(r) => r.id}
-              emptyMessage="no appraisals submitted yet"
-            />
-          )}
-        </Section>
-      </div>
-
-      {/* reject modal */}
-      <Modal
-        open={rejectTarget !== null}
-        onClose={() => {
-          setRejectTarget(null);
-          setRejectNote("");
-        }}
-        title="Reject appraisal"
-      >
-        <div className="space-y-4">
+      <main className="flex-1 max-w-7xl mx-auto px-6 md:px-8 py-10 w-full flex flex-col h-[calc(100vh-4rem)]">
+        
+        {/* Header & Stats Row */}
+        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-8 shrink-0">
           <div>
-            <label className="block text-[12px] text-text-secondary mb-1.5">
-              reason for rejection (optional)
-            </label>
+            <h1 className="text-3xl font-display text-blue mb-2">Faculty registry</h1>
+            <p className="text-sm text-text-secondary">Review and approve faculty appraisals.</p>
+          </div>
+          
+          <div className="flex gap-8 px-6 py-4 bg-surface-1 border border-rule rounded-[4px] shadow-sm">
+            <div>
+              <p className="text-[12px] text-text-tertiary font-medium mb-1">Total submitted</p>
+              <p className="text-2xl font-mono text-blue leading-none">{rows.length}</p>
+            </div>
+            <div className="w-px bg-rule" />
+            <div>
+              <p className="text-[12px] text-text-tertiary font-medium mb-1">Eligible for CAS</p>
+              <p className="text-2xl font-mono text-brown leading-none">{eligibleCount}</p>
+            </div>
+            <div className="w-px bg-rule" />
+            <div>
+              <p className="text-[12px] text-text-tertiary font-medium mb-1">Pending review</p>
+              <p className="text-2xl font-mono text-text leading-none">{pendingCount}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="mb-6 shrink-0 max-w-sm">
+          <input
+            placeholder="Filter by department..."
+            value={department}
+            onChange={(e) => setDepartment(e.target.value)}
+            className="w-full"
+          />
+        </div>
+
+        {/* Horizontal Appraisal Cards Feed */}
+        <div className="flex-1 overflow-y-auto pr-2 no-scrollbar pb-10">
+          {loading ? (
+            <div className="py-12 text-center text-sm text-text-tertiary animate-pulse-gentle">Loading registry...</div>
+          ) : rows.length === 0 ? (
+            <EmptyState message="No appraisals found matching your criteria." />
+          ) : (
+            <div className="flex flex-col gap-4">
+              {rows.map((r, i) => (
+                <div key={r.id} className={`p-6 bg-surface-1 border border-rule rounded-[4px] shadow-sm hover:border-rule-strong transition-colors animate-in stagger-${(i % 4) + 1} flex flex-col md:flex-row md:items-center justify-between gap-6`}>
+                  
+                  {/* Identity */}
+                  <div className="flex gap-5 min-w-0 flex-1">
+                    <div className="hidden sm:flex w-12 h-12 bg-surface-2 rounded-full items-center justify-center border border-rule shrink-0">
+                      <span className="text-lg font-display text-text-tertiary">{r.faculty_name.charAt(0)}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-lg font-medium text-text truncate">{r.faculty_name}</h3>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-[13px] font-mono text-text-secondary">{r.employee_code}</span>
+                        <span className="text-[13px] text-text-tertiary truncate">{r.department}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Scores & Status */}
+                  <div className="flex items-center gap-6 shrink-0 md:w-[350px] justify-between border-t md:border-t-0 border-rule pt-4 md:pt-0">
+                    <div>
+                      <p className="text-[11px] text-text-tertiary font-medium mb-1">API Score</p>
+                      <p className="text-xl font-mono text-brown">{r.total_api_score}</p>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      <StatusBadge status={r.eligible_for_cas} />
+                      <StatusBadge status={r.status} />
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-end gap-3 shrink-0 md:w-[200px] border-t md:border-t-0 border-rule pt-4 md:pt-0">
+                    <Button variant="secondary" size="sm" onClick={() => handleDownload(r.id, r.employee_code, r.academic_year)}>
+                      View PDF
+                    </Button>
+                    
+                    {role === "hod" && r.status === "submitted" && (
+                      <Button size="sm" onClick={() => handleApprove(r.id, "hod_approved")} className="bg-sage hover:bg-sage">Approve</Button>
+                    )}
+                    {role === "iqac" && r.status === "hod_approved" && (
+                      <Button size="sm" onClick={() => handleApprove(r.id, "iqac_approved")} className="bg-sage hover:bg-sage">Approve</Button>
+                    )}
+                    {["hod", "iqac", "admin"].includes(role || "") && r.status !== "rejected" && (
+                      <Button variant="danger" size="sm" onClick={() => setRejectTarget(r.id)}>Reject</Button>
+                    )}
+                  </div>
+
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+      </main>
+
+      {/* Reject Modal */}
+      <Modal open={rejectTarget !== null} onClose={() => { setRejectTarget(null); setRejectNote(""); }} title="Reject appraisal">
+        <div className="space-y-5">
+          <div>
+            <label className="block text-[13px] font-medium text-text-secondary mb-2">Reason for rejection (Optional)</label>
             <textarea
               rows={3}
               value={rejectNote}
               onChange={(e) => setRejectNote(e.target.value)}
-              placeholder="provide feedback for the faculty member..."
+              placeholder="Provide feedback for the faculty member..."
             />
           </div>
-          <div className="flex justify-end gap-3">
-            <Button
-              variant="ghost"
-              onClick={() => {
-                setRejectTarget(null);
-                setRejectNote("");
-              }}
-            >
-              cancel
-            </Button>
-            <Button variant="danger" onClick={handleReject}>
-              reject appraisal
-            </Button>
+          <div className="flex justify-end gap-3 pt-4 border-t border-rule mt-2">
+            <Button variant="ghost" onClick={() => { setRejectTarget(null); setRejectNote(""); }}>Cancel</Button>
+            <Button variant="danger" onClick={handleReject}>Reject appraisal</Button>
           </div>
         </div>
       </Modal>
-    </main>
+    </div>
   );
 }

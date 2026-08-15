@@ -36,18 +36,18 @@ export function Modal({ open, onClose, title, children }: Props) {
         if (e.target === overlayRef.current) onClose();
       }}
     >
-      <div className="absolute inset-0 bg-base/80 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-text/40 backdrop-blur-sm" />
       <div
-        className="relative w-full max-w-lg bg-surface-1 border border-rule rounded-[6px] p-6 shadow-2xl"
+        className="relative w-full max-w-lg bg-surface-1 border border-rule rounded-[4px] p-8 shadow-2xl"
         style={{ animation: "scaleIn 0.2s ease-out both" }}
       >
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-base font-display text-text">{title}</h3>
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-rule-subtle">
+          <h3 className="text-2xl font-display text-blue">{title}</h3>
           <button
             onClick={onClose}
-            className="text-text-tertiary hover:text-text transition-colors text-xl leading-none cursor-pointer w-7 h-7 flex items-center justify-center rounded-[3px] hover:bg-surface-3"
+            className="text-text-ghost hover:text-coral transition-colors text-xl leading-none cursor-pointer w-8 h-8 flex items-center justify-center rounded-[3px] hover:bg-coral-bg"
           >
-            x
+            ×
           </button>
         </div>
         {children}
