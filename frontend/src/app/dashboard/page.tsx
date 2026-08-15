@@ -451,14 +451,22 @@ export default function DashboardPage() {
             </label>
           </div>
           <div className="pt-4 border-t border-rule mt-2">
-            <label className="block text-[13px] font-medium text-text-secondary mb-2">Claimed API Score (Self-assessed)</label>
+            <div className="flex items-center justify-between bg-surface-2 rounded-[4px] px-4 py-3 mb-4">
+              <div>
+                <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wide">System estimate</p>
+                <p className="text-[13px] text-text-secondary mt-0.5">Based on UGC PBAS guidelines</p>
+              </div>
+              <span className="font-mono text-2xl text-blue font-semibold">{computedPubScore}</span>
+            </div>
+            <label className="block text-[13px] font-medium text-text-secondary mb-2">Your claimed score</label>
             <input 
               type="number" 
               step="0.1"
               value={pubForm.claimed_score} 
               onChange={(e) => setPubForm({ ...pubForm, claimed_score: e.target.value })} 
-              placeholder="Optional"
+              placeholder={`${computedPubScore} (defaults to estimate)`}
             />
+            <p className="text-[12px] text-text-tertiary mt-1.5">Adjust if you believe your contribution warrants a different score.</p>
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-rule mt-2">
             <Button variant="ghost" type="button" onClick={() => setPubModalOpen(false)}>Cancel</Button>
@@ -494,14 +502,22 @@ export default function DashboardPage() {
             <textarea rows={3} value={actForm.description} onChange={(e) => setActForm({ ...actForm, description: e.target.value })} />
           </div>
           <div className="pt-4 border-t border-rule mt-2">
-            <label className="block text-[13px] font-medium text-text-secondary mb-2">Claimed API Score (Self-assessed)</label>
+            <div className="flex items-center justify-between bg-surface-2 rounded-[4px] px-4 py-3 mb-4">
+              <div>
+                <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wide">System estimate</p>
+                <p className="text-[13px] text-text-secondary mt-0.5">Based on UGC PBAS guidelines</p>
+              </div>
+              <span className="font-mono text-2xl text-blue font-semibold">{computedActScore}</span>
+            </div>
+            <label className="block text-[13px] font-medium text-text-secondary mb-2">Your claimed score</label>
             <input 
               type="number" 
               step="0.1"
               value={actForm.claimed_score} 
               onChange={(e) => setActForm({ ...actForm, claimed_score: e.target.value })} 
-              placeholder="Optional"
+              placeholder={`${computedActScore} (defaults to estimate)`}
             />
+            <p className="text-[12px] text-text-tertiary mt-1.5">Adjust if you believe your contribution warrants a different score.</p>
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-rule mt-2">
             <Button variant="ghost" type="button" onClick={() => setActModalOpen(false)}>Cancel</Button>
