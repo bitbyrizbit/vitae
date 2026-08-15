@@ -64,7 +64,7 @@ The HOD reviewing the submission sees the final claimed total. The system assist
 | **Live Score Estimation** | As you fill out the "Add Publication" or "Log Activity" form, a real-time estimate banner shows the computed UGC score before you even submit. |
 | **Claimed Score Override** | Faculty can accept the system estimate or manually claim a different score if they believe their specific contribution warrants it. |
 | **Google Scholar Sync** | Paste your Scholar profile ID, hit sync. Vitae scrapes your publications, citation counts, and venues automatically. No manual retyping of 47 journal papers. |
-| **Unified Dossier Feed** | Every publication, seminar, workshop, FDP, project, and lecture appears in a single chronological timeline — sorted, categorized, and scored. |
+| **Unified Dossier Feed** | Every publication, seminar, workshop, FDP, project, and lecture appears in a single chronological timeline. Entries can be added, securely edited (with strict ownership guards), or removed at any time before final submission. |
 | **Three-Category Ledger** | A persistent sidebar displays Category I (Teaching), Category II (Co-curricular & Extension), and Category III (Research & Publications) scores in real time, along with the total API and CAS eligibility status. |
 | **One-Click Appraisal Submission** | Submit or recalculate your appraisal for the current academic year with a single button. The engine recomputes all three categories from your logged data. |
 | **PDF Generation** | Generate a structured, formatted appraisal report ready for IQAC submission. Separate Preview (opens in browser) and Download (saves file) actions. |
