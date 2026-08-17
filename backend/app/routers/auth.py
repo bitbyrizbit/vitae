@@ -24,6 +24,8 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
         password_hash=hash_password(payload.password),
         department=payload.department,
         designation=payload.designation,
+        academic_level=payload.academic_level,
+        date_of_joining=payload.date_of_joining,
         role=payload.role,
     )
     db.add(user)

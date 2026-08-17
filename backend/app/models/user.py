@@ -14,6 +14,8 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     department = Column(String, nullable=False)
     designation = Column(String, default="Assistant Professor")
+    academic_level = Column(String, default="Level 10")
+    date_of_joining = Column(String, nullable=True)
     role = Column(String, default="faculty")  # faculty | hod | iqac | admin
     scholar_profile_id = Column(String, nullable=True)
     joined_at = Column(DateTime, default=func.now())

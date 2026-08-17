@@ -68,6 +68,7 @@ export default function DashboardPage() {
 
   const [feed, setFeed] = useState<FeedItem[]>([]);
   const [appraisal, setAppraisal] = useState<Appraisal | null>(null);
+  const [casReadiness, setCasReadiness] = useState<any>(null);
   
   const [scholarId, setScholarId] = useState("");
   const [syncing, setSyncing] = useState(false);
@@ -131,13 +132,15 @@ export default function DashboardPage() {
   async function loadData() {
     setLoading(true);
     try {
-      const [pubRes, actRes] = await Promise.all([
+      const [pubsRes, actsRes, appRes, casRes] = await Promise.all([
         api.get("/faculty/me/publications"),
         api.get("/faculty/me/activities"),
+        api.get(`/faculty/me/appraisal/${ACADEMIC_YEAR}`).catch(() => ({ data: null })),
+        api.get("/faculty/me/cas-readiness").catch(() => ({ data: null }))
       ]);
       
       // Map to unified feed
-      const pubs: FeedItem[] = pubRes.data.map((p: any) => ({
+      const pubs: FeedItem[] = pubsRes.data.map((p: any) => ({
         type: "publication", id: p.id, title: p.title,
         date_val: p.year || 0, score: p.api_score,
         meta: p.pub_type.replace(/_/g, " ").charAt(0).toUpperCase() + p.pub_type.replace(/_/g, " ").slice(1),
@@ -145,7 +148,7 @@ export default function DashboardPage() {
         raw: p,
       }));
       
-      const acts: FeedItem[] = actRes.data.map((a: any) => ({
+      const acts: FeedItem[] = actsRes.data.map((a: any) => ({
         type: "activity", id: a.id, title: a.title,
         date_val: a.activity_date ? parseInt(a.activity_date.split("-")[0]) : 0,
         score: a.api_score,
@@ -157,14 +160,11 @@ export default function DashboardPage() {
       // Sort descending by date (year)
       const combined = [...pubs, ...acts].sort((a, b) => b.date_val - a.date_val);
       setFeed(combined);
+      
+      if (appRes.data) setAppraisal(appRes.data);
+      if (casRes.data) setCasReadiness(casRes.data);
     } catch (err) { console.error(err); }
-
-    try {
-      const res = await api.get(`/faculty/me/appraisal/${ACADEMIC_YEAR}`);
-      setAppraisal(res.data);
-    } catch { setAppraisal(null); }
-    
-    setLoading(false);
+    finally { setLoading(false); }
   }
 
   /* ------------------------------------------------------------ handlers */
@@ -267,6 +267,47 @@ export default function DashboardPage() {
     setSyncing(false);
   }
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [parsing, setParsing] = useState(false);
+
+  async function handleResumeUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== "application/pdf") {
+      addToast("Please upload a PDF file", "error");
+      return;
+    }
+
+    setParsing(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      addToast("AI parsing resume... This takes ~15 seconds", "info");
+      const res = await api.post("/faculty/me/resume-parse", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      const { publications, activities } = res.data;
+      
+      // Auto-save parsed data to dossier
+      for (const p of publications) {
+        await api.post("/faculty/me/publications", { ...p, claimed_score: p.claimed_score || 0 });
+      }
+      for (const a of activities) {
+        await api.post("/faculty/me/activities", { ...a, claimed_score: a.claimed_score || 0 });
+      }
+
+      addToast(`Extracted ${publications.length} publications and ${activities.length} activities!`, "success");
+      loadData();
+    } catch (err) {
+      console.error(err);
+      addToast("Failed to parse resume", "error");
+    } finally {
+      setParsing(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   async function handleSubmitAppraisal() {
     setSubmitting(true);
     try {
@@ -295,6 +336,35 @@ export default function DashboardPage() {
     } catch { addToast("Failed to fetch PDF", "error"); }
   }
 
+  const scopusFileInputRef = useRef<HTMLInputElement>(null);
+  const [scopusUploading, setScopusUploading] = useState(false);
+
+  async function handleScopusUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith(".csv")) {
+      addToast("Please upload a CSV file exported from Scopus", "error");
+      return;
+    }
+
+    setScopusUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await api.post("/faculty/me/scopus-upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      const count = res.data?.length || 0;
+      addToast(count > 0 ? `${count} new publications imported from Scopus` : "No new publications found", count > 0 ? "success" : "info");
+      loadData();
+    } catch { addToast("Failed to parse Scopus CSV", "error"); }
+    finally {
+      setScopusUploading(false);
+      if (scopusFileInputRef.current) scopusFileInputRef.current.value = "";
+    }
+  }
+
   /* ------------------------------------------------------------ render */
 
   return (
@@ -308,7 +378,7 @@ export default function DashboardPage() {
         <aside className="w-full md:w-[280px] shrink-0 flex flex-col gap-8 md:h-[calc(100vh-8rem)]">
           <div>
             <h2 className="text-xl font-display text-blue mb-4">Quick actions</h2>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 mb-6">
               <Button onClick={() => setPubModalOpen(true)} className="w-full justify-start">
                 + Add publication
               </Button>
@@ -318,21 +388,75 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="p-5 bg-surface-1 border border-rule rounded-[4px] shadow-sm">
-            <h3 className="text-[15px] font-medium text-text mb-2">Google Scholar</h3>
+          <div className="p-5 bg-gradient-to-br from-surface-1 to-base border border-blue/20 rounded-[4px] shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-blue" />
+            <h3 className="text-[15px] font-medium text-text mb-2 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+              AI Auto-fill
+            </h3>
             <p className="text-[13px] text-text-tertiary mb-4 leading-relaxed">
-              Auto-fetch publications from your profile URL ID.
+              Upload your academic CV (PDF). Vitae will automatically extract and score all your publications and activities.
             </p>
-            <div className="flex flex-col gap-3">
-              <input
-                placeholder="Profile ID (e.g. jX...)"
-                value={scholarId}
-                onChange={(e) => setScholarId(e.target.value)}
-                className="text-sm py-2"
-              />
-              <Button size="sm" onClick={handleScholarSync} disabled={syncing} loading={syncing} variant="secondary">
-                {syncing ? "Syncing..." : "Sync profile"}
-              </Button>
+            <input 
+              type="file" 
+              accept="application/pdf" 
+              className="hidden" 
+              ref={fileInputRef} 
+              onChange={handleResumeUpload} 
+            />
+            <Button 
+              size="sm" 
+              onClick={() => fileInputRef.current?.click()} 
+              disabled={parsing} 
+              loading={parsing} 
+              variant="outline" 
+              className="w-full border-blue/30 hover:border-blue hover:text-blue"
+            >
+              {parsing ? "Analyzing PDF..." : "Upload Resume (PDF)"}
+            </Button>
+          </div>
+
+          <div className="p-5 bg-surface-1 border border-rule rounded-[4px] shadow-sm">
+            <h3 className="text-[15px] font-medium text-text mb-2 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              External sync
+            </h3>
+            <p className="text-[13px] text-text-tertiary mb-4 leading-relaxed">
+              Auto-fetch publications from Google Scholar or import a Scopus CSV export.
+            </p>
+            
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <input
+                  placeholder="Scholar Profile ID (e.g. jX...)"
+                  value={scholarId}
+                  onChange={(e) => setScholarId(e.target.value)}
+                  className="text-sm py-2"
+                />
+                <Button size="sm" onClick={handleScholarSync} disabled={syncing} loading={syncing} variant="secondary">
+                  {syncing ? "Syncing..." : "Sync Scholar"}
+                </Button>
+              </div>
+
+              <div className="border-t border-rule pt-4">
+                <input 
+                  type="file" 
+                  accept=".csv" 
+                  className="hidden" 
+                  ref={scopusFileInputRef} 
+                  onChange={handleScopusUpload} 
+                />
+                <Button 
+                  size="sm" 
+                  onClick={() => scopusFileInputRef.current?.click()} 
+                  disabled={scopusUploading} 
+                  loading={scopusUploading} 
+                  variant="secondary" 
+                  className="w-full"
+                >
+                  {scopusUploading ? "Importing..." : "Upload Scopus CSV"}
+                </Button>
+              </div>
             </div>
           </div>
         </aside>
@@ -400,8 +524,56 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* Right Col: Score Ledger */}
+        {/* Right Col: Ledger & Roadmap */}
         <aside className="w-full md:w-[300px] shrink-0 flex flex-col gap-6 md:h-[calc(100vh-8rem)]">
+          {casReadiness && (
+            <div className="p-6 bg-surface-1 border border-blue/30 rounded-[4px] shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue to-orange" />
+              <h2 className="text-xl font-display text-text mb-2 flex items-center gap-2">
+                CAS Roadmap
+              </h2>
+              <p className="text-[13px] text-text-tertiary mb-5 leading-tight">
+                {casReadiness.current_level} → {casReadiness.target_level}
+              </p>
+              
+              <div className="flex flex-col gap-4">
+                <div className="w-full bg-rule rounded-full h-2">
+                  <div 
+                    className="bg-blue h-2 rounded-full transition-all duration-500" 
+                    style={{ width: `${casReadiness.progress_percentage}%` }}
+                  ></div>
+                </div>
+                
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between items-center text-[13px]">
+                    <span className="text-text-secondary">Years in service</span>
+                    <span className="font-mono text-text">{casReadiness.years_of_service_completed}/{casReadiness.years_of_service_required}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[13px]">
+                    <span className="text-text-secondary">Publications</span>
+                    <span className="font-mono text-text">{casReadiness.publications_completed}/{casReadiness.publications_required}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[13px]">
+                    <span className="text-text-secondary">Activities / Courses</span>
+                    <span className="font-mono text-text">{casReadiness.activities_completed}/{casReadiness.activities_required}</span>
+                  </div>
+                </div>
+                
+                <div className="pt-2">
+                  {casReadiness.is_ready ? (
+                    <div className="text-[13px] font-medium text-green bg-green/10 p-2 rounded text-center border border-green/20">
+                      Eligible for promotion!
+                    </div>
+                  ) : (
+                    <div className="text-[13px] text-text-tertiary text-center">
+                      Complete requirements to advance.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="p-6 bg-surface-1 border border-rule-strong rounded-[4px] shadow-sm sticky top-0">
             <h2 className="text-xl font-display text-blue border-b border-rule pb-3 mb-5">Score ledger</h2>
             

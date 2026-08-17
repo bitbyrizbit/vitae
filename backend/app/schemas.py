@@ -11,6 +11,8 @@ class RegisterRequest(BaseModel):
     password: str
     department: str
     designation: str = "Assistant Professor"
+    academic_level: str = "Level 10"
+    date_of_joining: Optional[str] = None
     role: str = "faculty"
 
 
@@ -33,6 +35,8 @@ class UserOut(BaseModel):
     employee_code: str
     department: str
     designation: str
+    academic_level: str
+    date_of_joining: Optional[str] = None
     role: str
     scholar_profile_id: Optional[str] = None
 
@@ -117,3 +121,8 @@ class AdminAppraisalOut(BaseModel):
         from_attributes = True
 class ScholarLinkRequest(BaseModel):
     scholar_profile_id: str
+
+
+class ResumeParseResult(BaseModel):
+    publications: list[PublicationCreate] = []
+    activities: list[ActivityCreate] = []

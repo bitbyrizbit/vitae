@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
@@ -12,13 +12,72 @@ from app.models.activity import Activity
 from app.models.appraisal import Appraisal
 from app.schemas import (
     PublicationCreate, PublicationOut, ActivityCreate, ActivityOut,
-    AppraisalOut, ScholarLinkRequest,
+    AppraisalOut, ScholarLinkRequest, ResumeParseResult
 )
 from app.services.pbas_engine import score_publication, score_activity, compute_appraisal_totals
 from app.services.scholar_scraper import fetch_scholar_publications
+from app.services.resume_parser import extract_data_from_resume
+from app.services.scopus_importer import parse_scopus_csv
+from app.services.cas_roadmap import evaluate_cas_readiness, CasReadinessResponse
 from app.services.pdf_generator import build_appraisal_pdf
 
 router = APIRouter(prefix="/faculty", tags=["faculty"])
+
+
+@router.post("/me/resume-parse", response_model=ResumeParseResult)
+async def parse_resume(file: UploadFile = File(...), user: User = Depends(get_current_user)):
+    if file.content_type != "application/pdf":
+        raise HTTPException(status_code=400, detail="Only PDF files are supported")
+    
+    contents = await file.read()
+    try:
+        result = extract_data_from_resume(contents)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to parse resume: {str(e)}")
+
+
+@router.post("/me/scopus-upload", response_model=list[PublicationOut])
+async def upload_scopus_csv(file: UploadFile = File(...), user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not file.filename.endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Only CSV files exported from Scopus are supported")
+        
+    contents = await file.read()
+    try:
+        pubs = parse_scopus_csv(contents)
+        
+        # Scopus doesnt provide a reliable unique ID in standard export other than Title
+        existing_titles = {
+            p.title.lower() for p in 
+            db.query(Publication).filter(Publication.faculty_id == user.id).all()
+        }
+        
+        new_rows = []
+        for pub in pubs:
+            if pub.title.lower() in existing_titles:
+                continue
+            row = Publication(
+                faculty_id=user.id,
+                source="scopus",
+                api_score=score_publication(pub.pub_type, pub.is_scopus_or_wos, pub.citation_count),
+                **pub.model_dump(exclude={"claimed_score"})
+            )
+            db.add(row)
+            new_rows.append(row)
+            
+        db.commit()
+        for row in new_rows:
+            db.refresh(row)
+        return new_rows
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to parse Scopus CSV: {str(e)}")
+
+
+@router.get("/me/cas-readiness", response_model=CasReadinessResponse)
+def get_cas_readiness(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    pubs = db.query(Publication).filter(Publication.faculty_id == user.id).all()
+    acts = db.query(Activity).filter(Activity.faculty_id == user.id).all()
+    return evaluate_cas_readiness(user, pubs, acts)
 
 
 @router.get("/me/publications", response_model=list[PublicationOut])
