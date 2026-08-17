@@ -3,16 +3,16 @@ import { Button } from "@/components/Button";
 
 const features = [
   {
-    title: "Instant UGC scoring",
-    body: "Every publication and activity you log is scored against the UGC API point table in real-time. No spreadsheets, no waiting for HR calculations.",
+    title: "Automated Resume Extraction",
+    body: "Upload your CV. Vitae instantly extracts, categorizes, and assesses your academic publications and activities—zero manual data entry required.",
   },
   {
-    title: "Google Scholar sync",
-    body: "Link your Google Scholar profile once. Vitae pulls your publications, citation counts, and venue data automatically, deduplicating everything.",
+    title: "Google Scholar & Scopus Sync",
+    body: "Automated integration for easy migration of data. Vitae pulls citations, venues, and documents, instantly scoring them against UGC API rules.",
   },
   {
-    title: "Audit-ready reporting",
-    body: "HOD and IQAC review chains are built right in. Generates perfectly formatted PDF exports ready for CAS committees and NAAC reporting.",
+    title: "Dynamic UGC Score Evaluation",
+    body: "Deterministic, rule-based scoring engine (zero hallucinations). Faculty receive real-time CAS eligibility tracking and audit-ready PDF exports.",
   },
 ];
 
@@ -42,10 +42,10 @@ export default function LandingPage() {
         <div className="lg:col-span-7 flex flex-col justify-center animate-in">
           <div className="w-12 h-1 bg-brown mb-8" />
           <h1 className="text-5xl md:text-7xl text-blue font-display leading-[1.05] tracking-tight mb-8">
-            The appraisal system that actually does the math.
+            Stop counting points.<br />Start proving impact.
           </h1>
           <p className="text-lg md:text-xl text-text-secondary mb-12 max-w-2xl leading-relaxed font-body">
-            Vitae replaces yearly appraisal paperwork with a unified dossier. It computes your UGC API score as you log activities, pulls publications from Google Scholar, and hands your IQAC office exactly the record it needs.
+            1.5 million faculty waste weeks manually cross-referencing UGC circulars to calculate API scores, while IQAC offices drown in unverified spreadsheets. Vitae is a deterministic appraisal engine that computes UGC PBAS scores in real-time, syncs research automatically, and generates IQAC-ready dossiers.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link href="/register">
