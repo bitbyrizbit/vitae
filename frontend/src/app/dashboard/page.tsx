@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { useSession, useToast } from "@/lib/store";
@@ -409,7 +409,7 @@ export default function DashboardPage() {
               onClick={() => fileInputRef.current?.click()} 
               disabled={parsing} 
               loading={parsing} 
-              variant="outline" 
+              variant="secondary" 
               className="w-full border-blue/30 hover:border-blue hover:text-blue"
             >
               {parsing ? "Analyzing PDF..." : "Upload Resume (PDF)"}
