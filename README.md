@@ -60,14 +60,14 @@ The HOD reviewing the submission sees the final claimed total. The system assist
 
 | Capability | What It Does |
 |---|---|
-| **Deterministic Scoring Engine** | Evaluates every publication and activity against UGC API tables instantly. Factors in publication type, Scopus/WoS indexing, UGC-CARE listing, and citation count to produce a base score + bonuses. |
-| **Live Score Estimation** | As you fill out the "Add Publication" or "Log Activity" form, a real-time estimate banner shows the computed UGC score before you even submit. |
+| **Deterministic Scoring Engine** | Evaluates every publication and activity against UGC API tables instantly. Zero LLM hallucinations. The engine calculates base points, Scopus/WoS bonuses, and citation bonuses purely through math. |
+| **AI Resume Extraction** | Drop your PDF CV into the dashboard. Vitae's backend (powered by Gemini) strictly parses your publications, categorizes them, scores them, and instantly builds your dossier. No manual typing required. |
+| **Scopus & Google Scholar Sync** | Paste your Scholar profile ID, or upload a Scopus export CSV. Vitae scrapes and parses publications, citation counts, and venues automatically, deduplicating everything against your existing record. |
+| **Dynamic CAS Roadmap** | A real-time tracker that constantly compares your completed years of service, publications, and activities against the strict UGC 2018 guidelines to tell you exactly how close you are to your next Academic Level promotion. |
+| **Live Score Estimation** | As you fill out forms or sync data, a real-time estimate banner shows the computed UGC score before you even submit. |
 | **Claimed Score Override** | Faculty can accept the system estimate or manually claim a different score if they believe their specific contribution warrants it. |
-| **Google Scholar Sync** | Paste your Scholar profile ID, hit sync. Vitae scrapes your publications, citation counts, and venues automatically. No manual retyping of 47 journal papers. |
-| **Unified Dossier Feed** | Every publication, seminar, workshop, FDP, project, and lecture appears in a single chronological timeline. Entries can be added, securely edited (with strict ownership guards), or removed at any time before final submission. |
-| **Three-Category Ledger** | A persistent sidebar displays Category I (Teaching), Category II (Co-curricular & Extension), and Category III (Research & Publications) scores in real time, along with the total API and CAS eligibility status. |
-| **One-Click Appraisal Submission** | Submit or recalculate your appraisal for the current academic year with a single button. The engine recomputes all three categories from your logged data. |
-| **PDF Generation** | Generate a structured, formatted appraisal report ready for IQAC submission. Separate Preview (opens in browser) and Download (saves file) actions. |
+| **Three-Category Ledger** | A persistent sidebar displays Category I, Category II, and Category III scores in real time, along with the total API and CAS eligibility status. |
+| **ReportLab A4 Compilation** | Generate a structured, 10-page formatted appraisal report perfectly adhering to the UGC Proforma (Parts A, B, C, D, and E), ready for IQAC submission and signatures. |
 
 ### For HODs, IQAC, and Administrators
 
