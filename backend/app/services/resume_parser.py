@@ -42,7 +42,7 @@ def extract_data_from_resume(file_bytes: bytes) -> ResumeParseResult:
     """
 
     response = client.models.generate_content(
-        model='gemini-2.5-flash',
+        model='gemini-3.6-flash',
         contents=prompt.format(text=text),
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
