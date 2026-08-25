@@ -375,7 +375,7 @@ export default function DashboardPage() {
                         <main className="flex-1 w-full px-6 md:px-12 py-10 flex flex-col xl:flex-row gap-12">
         
         {/* LEFT COLUMN: Hero & Feed */}
-        <div className="w-full xl:w-[800px] 2xl:w-[900px] shrink-0 flex flex-col gap-12">
+        <div className="flex-1 min-w-0 flex flex-col gap-10">
           
                     {/* CAS ROADMAP HERO */}
           <section className="w-full">
@@ -415,9 +415,9 @@ export default function DashboardPage() {
                   </div>
                   
                   {/* Right Blocks Wrapper */}
-                  <div className="flex flex-col md:flex-row gap-6 shrink-0">
+                  <div className="flex flex-col gap-5 shrink-0 w-full md:w-[280px]">
                     {/* Middle: The Score Ledger */}
-                    <div className="w-full md:w-[280px] shrink-0 bg-base rounded-md p-5 border border-rule shadow-inner flex flex-col gap-4 relative">
+                    <div className="w-full shrink-0 bg-base rounded-md p-5 border border-rule shadow-inner flex flex-col gap-4 relative">
                       <div className="flex justify-between items-center">
                         <span className="text-xs font-bold text-text-secondary uppercase tracking-widest">Total API</span>
                         <span className="font-mono text-4xl text-blue font-bold">{appraisal?.total_api_score ?? 0}</span>
@@ -454,7 +454,7 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Right: Appraisal Document Generator */}
-                    <div className="w-full md:w-[260px] shrink-0 bg-surface-1 border border-rule rounded-md p-5 shadow-sm flex flex-col justify-between">
+                    <div className="w-full shrink-0 bg-surface-1 border border-rule rounded-md p-5 shadow-sm flex flex-col justify-between">
                       <div className="mb-4">
                         <h3 className="text-[13px] font-bold text-text-secondary uppercase tracking-widest mb-1.5 flex items-center gap-2">
                           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brown"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -555,14 +555,14 @@ export default function DashboardPage() {
         </div>
 
         {/* MIDDLE COLUMN: Expandable Analytics (Absorbs empty space) */}
-        <div className="hidden 2xl:flex flex-col flex-1 min-w-[360px] border-l border-r border-rule px-8">
+        <div className="hidden 2xl:flex flex-col w-[380px] shrink-0 border-l border-r border-rule px-8">
           <div className="pb-3 border-b border-rule-strong mb-6">
-            <h2 className="text-lg font-display text-text">Dossier Analytics Engine</h2>
+            <h2 className="text-lg font-display text-text">Dossier Analytics</h2>
             <p className="text-[11px] text-text-tertiary mt-1">Real-time breakdown of UGC PBAS trajectory</p>
           </div>
 
-          {/* Widget Grid: 1 col on 2xl, 2 cols on ultra-wide zoom-outs */}
-          <div className="grid grid-cols-1 min-[2000px]:grid-cols-2 gap-10 content-start flex-1 mb-10">
+          {/* Vertical Stack */}
+          <div className="flex flex-col gap-8 content-start flex-1 mb-10">
             
             {/* Widget 1: Score Distribution */}
             <div className="flex flex-col gap-4">
@@ -600,8 +600,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Widget 2: Platform Activity */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 pt-2 border-t border-rule-subtle">
               <h3 className="text-[12px] font-bold text-text-secondary uppercase tracking-widest">Record Volume</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-surface-1 border border-rule rounded-md p-4 flex flex-col justify-center items-center text-center">
@@ -616,9 +615,8 @@ export default function DashboardPage() {
             </div>
 
             {/* Widget 3: Gap Analysis */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 pt-2 border-t border-rule-subtle">
               <h3 className="text-[12px] font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-orange rounded-full animate-pulse" />
                 Gap Analysis
               </h3>
               <div className="bg-orange/5 border border-orange/20 rounded-md p-4">
@@ -649,7 +647,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Widget 4: Citation Velocity */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 pt-2 border-t border-rule-subtle">
               <h3 className="text-[12px] font-bold text-text-secondary uppercase tracking-widest">Citation Velocity</h3>
               <div className="h-28 flex items-end gap-1.5 opacity-80 pt-4">
                 {/* Mock bar chart capped width */}
@@ -667,7 +665,7 @@ export default function DashboardPage() {
 
           <div className="mt-auto pt-6 border-t border-rule-subtle flex justify-between items-center text-[11px] font-mono text-text-ghost">
             <span className="flex items-center gap-1.5 text-green">
-               <span className="w-1.5 h-1.5 rounded-full bg-green" /> LIVE PIPELINE
+               <span className="w-1.5 h-1.5 rounded-full bg-green" /> LIVE SYNC
             </span>
             <span>v2025.1.0</span>
           </div>
