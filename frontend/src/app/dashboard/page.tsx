@@ -456,13 +456,13 @@ export default function DashboardPage() {
                       </Button>
                       {appraisal && (
                         <div className="flex gap-2 w-full mt-1">
-                          <Button variant="secondary" onClick={() => handleDownloadPdf(true)} className="flex-1 px-1 flex gap-1.5 justify-center items-center text-[11px] py-1 min-h-[28px]">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-tertiary mb-[1px]"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <span className="leading-none mt-[1px]">Preview</span>
+                          <Button size="sm" variant="secondary" onClick={() => handleDownloadPdf(true)} style={{ paddingLeft: '0', paddingRight: '0' }} className="flex-1 flex gap-1.5 justify-center items-center text-[10px] min-h-[26px]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-tertiary"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <span className="leading-none pt-[1px]">Preview</span>
                           </Button>
-                          <Button variant="secondary" onClick={() => handleDownloadPdf(false)} className="flex-1 px-1 flex gap-1.5 justify-center items-center text-[11px] py-1 min-h-[28px]">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-tertiary mb-[1px]"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                            <span className="leading-none mt-[1px]">Download</span>
+                          <Button size="sm" variant="secondary" onClick={() => handleDownloadPdf(false)} style={{ paddingLeft: '0', paddingRight: '0' }} className="flex-1 flex gap-1.5 justify-center items-center text-[10px] min-h-[26px]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-tertiary"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            <span className="leading-none pt-[1px]">Download</span>
                           </Button>
                         </div>
                       )}
