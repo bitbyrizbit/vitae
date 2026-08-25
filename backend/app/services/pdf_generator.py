@@ -50,6 +50,10 @@ def build_appraisal_pdf(faculty, appraisal, publications, activities) -> bytes:
         "bold_normal", parent=styles["Normal"], fontSize=10, spaceAfter=6, 
         fontName="Helvetica-Bold"
     )
+    
+    bold_cell_style = ParagraphStyle("bold_cell", parent=styles["Normal"], fontSize=9, fontName="Helvetica-Bold", leading=11)
+    normal_cell_style = ParagraphStyle("normal_cell", parent=styles["Normal"], fontSize=9, fontName="Helvetica", leading=11)
+
 
     elements = []
 
@@ -65,24 +69,24 @@ def build_appraisal_pdf(faculty, appraisal, publications, activities) -> bytes:
     faculty_doj = getattr(faculty, 'date_of_joining', 'Not Provided')
     
     info_data = [
-        ["1.", "Name (in Block Letters)", f": {faculty.name.upper()}"],
-        ["2.", "Father's/Mother's/Husband's Name", ": -"],
-        ["3.", "Department", f": {faculty.department}"],
-        ["4.", "Current Designation & Academic Level", f": {faculty.designation} ({faculty_level})"],
-        ["5.", "Date of Last Promotion", ": -"],
-        ["6.", "Which position and grade pay are you an applicant under CAS?", f": Promotion from {faculty_level}"],
-        ["7.", "Date of Eligibility for promotion", ": -"],
-        ["8.", "Date and Place of Birth", ": -"],
-        ["9.", "Sex", ": -"],
-        ["10.", "Marital Status", ": -"],
-        ["11.", "Nationality", ": Indian"],
-        ["12.", "Indicate whether belongs to SC/ST/OBC category", ": -"],
-        ["13.", "Address for correspondence (with Pin code)", ": -"],
-        ["14.", "Permanent Address (with Pin code)", ": -"],
-        ["15.", "Telephone No", ": -"],
-        ["16.", "Email", f": {faculty.email}"],
-        ["17.", "Employee Code", f": {faculty.employee_code}"],
-        ["18.", "Date of Joining", f": {faculty_doj}"],
+        ["1.", Paragraph("Name (in Block Letters)", bold_cell_style), Paragraph(f": {faculty.name.upper()}", normal_cell_style)],
+        ["2.", Paragraph("Father's/Mother's/Husband's Name", bold_cell_style), Paragraph(": -", normal_cell_style)],
+        ["3.", Paragraph("Department", bold_cell_style), Paragraph(f": {faculty.department}", normal_cell_style)],
+        ["4.", Paragraph("Current Designation & Academic Level", bold_cell_style), Paragraph(f": {faculty.designation} ({faculty_level})", normal_cell_style)],
+        ["5.", Paragraph("Date of Last Promotion", bold_cell_style), Paragraph(": -", normal_cell_style)],
+        ["6.", Paragraph("Which position and grade pay are you an applicant under CAS?", bold_cell_style), Paragraph(f": Promotion from {faculty_level}", normal_cell_style)],
+        ["7.", Paragraph("Date of Eligibility for promotion", bold_cell_style), Paragraph(": -", normal_cell_style)],
+        ["8.", Paragraph("Date and Place of Birth", bold_cell_style), Paragraph(": -", normal_cell_style)],
+        ["9.", Paragraph("Sex", bold_cell_style), Paragraph(": -", normal_cell_style)],
+        ["10.", Paragraph("Marital Status", bold_cell_style), Paragraph(": -", normal_cell_style)],
+        ["11.", Paragraph("Nationality", bold_cell_style), Paragraph(": Indian", normal_cell_style)],
+        ["12.", Paragraph("Indicate whether belongs to SC/ST/OBC category", bold_cell_style), Paragraph(": -", normal_cell_style)],
+        ["13.", Paragraph("Address for correspondence (with Pin code)", bold_cell_style), Paragraph(": -", normal_cell_style)],
+        ["14.", Paragraph("Permanent Address (with Pin code)", bold_cell_style), Paragraph(": -", normal_cell_style)],
+        ["15.", Paragraph("Telephone No", bold_cell_style), Paragraph(": -", normal_cell_style)],
+        ["16.", Paragraph("Email", bold_cell_style), Paragraph(f": {faculty.email}", normal_cell_style)],
+        ["17.", Paragraph("Employee Code", bold_cell_style), Paragraph(f": {faculty.employee_code}", normal_cell_style)],
+        ["18.", Paragraph("Date of Joining", bold_cell_style), Paragraph(f": {faculty_doj}", normal_cell_style)],
     ]
     
     info_table = Table(info_data, colWidths=[10*mm, 80*mm, 80*mm], hAlign='LEFT')
@@ -113,7 +117,7 @@ def build_appraisal_pdf(faculty, appraisal, publications, activities) -> bytes:
     elements.append(Paragraph("(Details to be attached as Annexure II)", normal_style))
     
     if activities:
-        act_rows = [["S.No.", "Type of Activity", "Title / Detail", "Date", "API Score"]]
+        act_rows = [[Paragraph("S.No.", bold_cell_style), Paragraph("Type of Activity", bold_cell_style), Paragraph("Title / Detail", bold_cell_style), Paragraph("Date", bold_cell_style), Paragraph("API Score", bold_cell_style)]]
         for idx, a in enumerate(activities):
             act_rows.append([
                 str(idx+1),
@@ -142,7 +146,7 @@ def build_appraisal_pdf(faculty, appraisal, publications, activities) -> bytes:
     elements.append(Paragraph("III A. Research Papers Published in Journals / Conferences", section_style))
     
     if publications:
-        pub_rows = [["S.No.", "Title with page nos.", "Journal / Conference", "ISSN/ISBN", "Peer Reviewed/UGC", "Score"]]
+        pub_rows = [[Paragraph("S.No.", bold_cell_style), Paragraph("Title with page nos.", bold_cell_style), Paragraph("Journal / Conference", bold_cell_style), Paragraph("ISSN/ISBN", bold_cell_style), Paragraph("Peer Reviewed/UGC", bold_cell_style), Paragraph("Score", bold_cell_style)]]
         for idx, p in enumerate(publications):
             is_ugc = "Yes" if p.is_ugc_care or p.is_scopus_or_wos else "No"
             pub_rows.append([
@@ -169,11 +173,11 @@ def build_appraisal_pdf(faculty, appraisal, publications, activities) -> bytes:
     elements.append(Paragraph("SUMMARY OF API SCORES", part_heading_style))
     
     sum_rows = [
-        ["Category", "Criteria", "API Score Claimed"],
-        ["I", "Teaching, Learning and Evaluation", f"{appraisal.category_i_score}"],
-        ["II", "Co-curricular, Extension, Professional Development", f"{appraisal.category_ii_score}"],
-        ["III", "Research and Academic Contributions", f"{appraisal.category_iii_score}"],
-        ["", "TOTAL API SCORE", f"{appraisal.total_api_score}"]
+        [Paragraph("Category", bold_cell_style), Paragraph("Criteria", bold_cell_style), Paragraph("API Score Claimed", bold_cell_style)],
+        ["I", Paragraph("Teaching, Learning and Evaluation", normal_cell_style), f"{appraisal.category_i_score}"],
+        ["II", Paragraph("Co-curricular, Extension, Professional Development", normal_cell_style), f"{appraisal.category_ii_score}"],
+        ["III", Paragraph("Research and Academic Contributions", normal_cell_style), f"{appraisal.category_iii_score}"],
+        ["", Paragraph("TOTAL API SCORE", bold_cell_style), f"{appraisal.total_api_score}"]
     ]
     
     sum_table = Table(sum_rows, colWidths=[20*mm, 110*mm, 40*mm])
