@@ -19,7 +19,7 @@ export function TopBar() {
   return (
     <header className="border-b border-rule bg-surface-1 sticky top-0 z-40">
       <div className="h-1 bg-brown" />
-      <div className="max-w-[1500px] mx-auto px-6 md:px-10 h-16 flex items-center justify-between relative">
+      <div className="w-full px-6 md:px-12 h-16 flex items-center justify-between relative">
         
         {/* Left: Navigation */}
         <div className="flex items-center gap-6 w-1/3">

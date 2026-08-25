@@ -372,13 +372,13 @@ export default function DashboardPage() {
       <TopBar />
       <ToastContainer />
 
-                  <main className="flex-1 max-w-[1500px] w-full mx-auto px-6 md:px-10 py-10 flex flex-col xl:flex-row gap-12">
+                  <main className="flex-1 w-full px-6 md:px-12 py-10 flex flex-col xl:flex-row gap-12">
         
         {/* LEFT COLUMN: Hero & Feed */}
         <div className="flex-1 min-w-0 flex flex-col gap-12">
           
           {/* CAS ROADMAP HERO */}
-          <section className="w-full">
+          <section className="w-full max-w-[1200px]">
             {casReadiness ? (
               <div className="w-full bg-surface-1 border border-blue/20 rounded-lg shadow-sm relative">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-blue" />
@@ -461,7 +461,7 @@ export default function DashboardPage() {
           </section>
 
           {/* DOSSIER FEED */}
-          <section className="w-full">
+          <section className="w-full max-w-[1200px]">
             <div className="flex items-end justify-between pb-4 border-b border-rule-strong mb-8">
               <div>
                 <h2 className="text-2xl font-display text-text">Dossier Chronology</h2>
