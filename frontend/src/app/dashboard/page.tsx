@@ -375,7 +375,7 @@ export default function DashboardPage() {
       <main className="flex-1 max-w-[1400px] w-full mx-auto px-6 md:px-8 flex flex-col md:flex-row gap-8 lg:gap-12 py-8 overflow-hidden">
         
         {/* Left Col: Actions & Tools */}
-        <aside className="w-full md:w-[280px] shrink-0 flex flex-col gap-8 md:h-[calc(100vh-8rem)]">
+        <aside className="w-full md:w-[280px] shrink-0 flex flex-col gap-8 md:h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar">
           <div>
             <h2 className="text-xl font-display text-blue mb-4">Quick actions</h2>
             <div className="flex flex-col gap-3 mb-6">
@@ -525,7 +525,7 @@ export default function DashboardPage() {
         </section>
 
         {/* Right Col: Ledger & Roadmap */}
-        <aside className="w-full md:w-[300px] shrink-0 flex flex-col gap-6 md:h-[calc(100vh-8rem)]">
+        <aside className="w-full md:w-[300px] shrink-0 flex flex-col gap-6 md:h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar">
           {casReadiness && (
             <div className="p-6 bg-surface-1 border border-blue/30 rounded-[4px] shadow-sm relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue to-orange" />
