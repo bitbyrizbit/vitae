@@ -451,18 +451,18 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="flex flex-col gap-2 pt-4 border-t border-rule mt-auto">
-                      <Button onClick={handleSubmitAppraisal} loading={submitting} disabled={submitting} className="w-full text-[11px] py-1 min-h-[30px]">
+                      <Button onClick={handleSubmitAppraisal} loading={submitting} disabled={submitting} className="w-full text-[12px] py-1.5 min-h-[32px]">
                         {appraisal ? "Recalculate Record" : "Compile Appraisal"}
                       </Button>
                       {appraisal && (
                         <div className="flex gap-2 w-full mt-1">
-                          <Button variant="secondary" onClick={() => handleDownloadPdf(true)} className="flex-1 px-0 flex gap-1.5 justify-center items-center text-[10px] py-1 min-h-[26px]">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                            Preview
+                          <Button variant="secondary" onClick={() => handleDownloadPdf(true)} className="flex-1 px-1 flex gap-1.5 justify-center items-center text-[11px] py-1 min-h-[28px]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-tertiary mb-[1px]"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <span className="leading-none mt-[1px]">Preview</span>
                           </Button>
-                          <Button variant="secondary" onClick={() => handleDownloadPdf(false)} className="flex-1 px-0 flex gap-1.5 justify-center items-center text-[10px] py-1 min-h-[26px]">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                            Download
+                          <Button variant="secondary" onClick={() => handleDownloadPdf(false)} className="flex-1 px-1 flex gap-1.5 justify-center items-center text-[11px] py-1 min-h-[28px]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-tertiary mb-[1px]"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            <span className="leading-none mt-[1px]">Download</span>
                           </Button>
                         </div>
                       )}
