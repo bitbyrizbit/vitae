@@ -376,7 +376,7 @@ export default function DashboardPage() {
         
         {/* Left Col: Actions & Tools */}
         <aside className="w-full md:w-[280px] shrink-0 flex flex-col gap-8 md:h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar">
-          <div>
+          <div className="shrink-0">
             <h2 className="text-xl font-display text-blue mb-4">Quick actions</h2>
             <div className="flex flex-col gap-3 mb-6">
               <Button onClick={() => setPubModalOpen(true)} className="w-full justify-start">
@@ -388,7 +388,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="p-5 bg-gradient-to-br from-surface-1 to-base border border-blue/20 rounded-[4px] shadow-sm relative overflow-hidden">
+          <div className="shrink-0 p-5 bg-gradient-to-br from-surface-1 to-base border border-blue/20 rounded-[4px] shadow-sm relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-blue" />
             <h3 className="text-[15px] font-medium text-text mb-2 flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
@@ -416,7 +416,7 @@ export default function DashboardPage() {
             </Button>
           </div>
 
-          <div className="p-5 bg-surface-1 border border-rule rounded-[4px] shadow-sm">
+          <div className="shrink-0 p-5 bg-surface-1 border border-rule rounded-[4px] shadow-sm">
             <h3 className="text-[15px] font-medium text-text mb-2 flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
               External sync
@@ -527,7 +527,7 @@ export default function DashboardPage() {
         {/* Right Col: Ledger & Roadmap */}
         <aside className="w-full md:w-[300px] shrink-0 flex flex-col gap-6 md:h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar">
           {casReadiness && (
-            <div className="p-6 bg-surface-1 border border-blue/30 rounded-[4px] shadow-sm relative overflow-hidden">
+            <div className="shrink-0 p-6 bg-surface-1 border border-blue/30 rounded-[4px] shadow-sm relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue to-orange" />
               <h2 className="text-xl font-display text-text mb-2 flex items-center gap-2">
                 CAS Roadmap
@@ -574,7 +574,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-          <div className="p-6 bg-surface-1 border border-rule-strong rounded-[4px] shadow-sm sticky top-0">
+          <div className="shrink-0 p-6 bg-surface-1 border border-rule-strong rounded-[4px] shadow-sm sticky top-0">
             <h2 className="text-xl font-display text-blue border-b border-rule pb-3 mb-5">Score ledger</h2>
             
             <div className="flex flex-col gap-4 mb-6">
