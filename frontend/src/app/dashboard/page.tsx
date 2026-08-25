@@ -372,148 +372,240 @@ export default function DashboardPage() {
       <TopBar />
       <ToastContainer />
 
-      <main className="flex-1 max-w-[1400px] w-full mx-auto px-6 md:px-8 flex flex-col md:flex-row gap-8 lg:gap-12 py-8">
+            <main className="flex-1 max-w-[1400px] w-full mx-auto px-4 md:px-8 py-8 flex flex-col gap-10">
         
-        {/* Left Col: Actions & Tools */}
-        <aside className="w-full md:w-[280px] shrink-0 flex flex-col gap-8 sticky top-8 h-fit">
-          <div className="shrink-0">
-            <h2 className="text-xl font-display text-blue mb-4">Quick actions</h2>
-            <div className="flex flex-col gap-3 mb-6">
-              <Button onClick={() => setPubModalOpen(true)} className="w-full justify-start">
-                + Add publication
-              </Button>
-              <Button variant="secondary" onClick={() => setActModalOpen(true)} className="w-full justify-start">
-                + Log activity
+        {/* 1. HERO SECTION: CAS ROADMAP & COMMAND CENTER */}
+        <section className="w-full">
+          {casReadiness ? (
+            <div className="w-full bg-surface-1 border border-blue/30 rounded-xl shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue via-purple-500 to-orange" />
+              <div className="p-8 md:p-10 flex flex-col lg:flex-row gap-10 lg:items-center justify-between">
+                
+                {/* Left: The Roadmap */}
+                <div className="flex-1">
+                  <h1 className="text-3xl md:text-4xl font-display text-text mb-2 tracking-tight">CAS Roadmap</h1>
+                  <p className="text-text-secondary text-lg mb-8 font-medium">
+                    {casReadiness.current_level} <span className="mx-3 text-text-tertiary">→</span> {casReadiness.target_level}
+                  </p>
+                  
+                  <div className="w-full bg-rule rounded-full h-3 mb-6">
+                    <div 
+                      className="bg-gradient-to-r from-blue to-purple-500 h-3 rounded-full transition-all duration-1000 ease-out" 
+                      style={{ width: `${casReadiness.progress_percentage}%` }}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-6">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[11px] text-text-tertiary uppercase tracking-wider font-semibold">Years</span>
+                      <span className="font-mono text-2xl text-text">{casReadiness.years_of_service_completed} <span className="text-sm text-text-ghost font-sans">/ {casReadiness.years_of_service_required}</span></span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[11px] text-text-tertiary uppercase tracking-wider font-semibold">Publications</span>
+                      <span className="font-mono text-2xl text-text">{casReadiness.publications_completed} <span className="text-sm text-text-ghost font-sans">/ {casReadiness.publications_required}</span></span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[11px] text-text-tertiary uppercase tracking-wider font-semibold">Activities</span>
+                      <span className="font-mono text-2xl text-text">{casReadiness.activities_completed} <span className="text-sm text-text-ghost font-sans">/ {casReadiness.activities_required}</span></span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Right: The Score Ledger */}
+                <div className="lg:w-[380px] shrink-0 bg-base rounded-lg p-7 border border-rule shadow-inner flex flex-col gap-5 relative">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-bold text-text-secondary uppercase tracking-widest">Total API Score</span>
+                    <span className="font-mono text-5xl text-blue font-bold">{appraisal?.total_api_score ?? 0}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-2 py-5 border-y border-rule text-center">
+                    <div>
+                      <span className="block text-[10px] text-text-tertiary uppercase font-bold tracking-wider mb-1">Cat I</span>
+                      <span className="font-mono text-lg text-text">{appraisal?.category_i_score ?? 0}</span>
+                    </div>
+                    <div className="border-x border-rule">
+                      <span className="block text-[10px] text-text-tertiary uppercase font-bold tracking-wider mb-1">Cat II</span>
+                      <span className="font-mono text-lg text-text">{appraisal?.category_ii_score ?? 0}</span>
+                    </div>
+                    <div>
+                      <span className="block text-[10px] text-text-tertiary uppercase font-bold tracking-wider mb-1">Cat III</span>
+                      <span className="font-mono text-lg text-text">{appraisal?.category_iii_score ?? 0}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center mt-1">
+                    {casReadiness.is_ready ? (
+                      <span className="text-[13px] font-bold text-green flex items-center gap-2">
+                        <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green"></span></span>
+                        Eligible for Promotion
+                      </span>
+                    ) : (
+                      <span className="text-[13px] font-medium text-orange flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-orange"></div> Requirements Pending
+                      </span>
+                    )}
+                    {appraisal && <StatusBadge status={appraisal.status} />}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          ) : (
+             <div className="w-full bg-surface-1 border border-rule rounded-xl shadow-sm p-10 flex justify-center items-center">
+                <p className="text-text-tertiary animate-pulse">Loading Roadmap Data...</p>
+             </div>
+          )}
+        </section>
+
+        {/* 2. THE ACTION RIBBON */}
+        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          
+          {/* AI Auto-fill */}
+          <div className="p-6 bg-gradient-to-br from-surface-1 to-base border border-blue/20 rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden group hover:border-blue/50 transition-colors">
+            <div className="absolute top-0 left-0 w-1.5 h-full bg-blue" />
+            <div className="mb-6 pl-2">
+              <h3 className="text-lg font-medium text-text mb-2 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                AI Auto-fill
+              </h3>
+              <p className="text-[13px] text-text-tertiary leading-relaxed">
+                Upload your academic CV. Vitae extracts and scores publications automatically.
+              </p>
+            </div>
+            <div className="pl-2">
+              <input type="file" accept="application/pdf" className="hidden" ref={fileInputRef} onChange={handleResumeUpload} />
+              <Button onClick={() => fileInputRef.current?.click()} disabled={parsing} loading={parsing} variant="secondary" className="w-full border-blue/30 hover:border-blue hover:text-blue">
+                {parsing ? "Analyzing PDF..." : "Upload Resume (PDF)"}
               </Button>
             </div>
           </div>
 
-          <div className="shrink-0 p-5 bg-gradient-to-br from-surface-1 to-base border border-blue/20 rounded-[4px] shadow-sm relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-1 h-full bg-blue" />
-            <h3 className="text-[15px] font-medium text-text mb-2 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-              AI Auto-fill
-            </h3>
-            <p className="text-[13px] text-text-tertiary mb-4 leading-relaxed">
-              Upload your academic CV (PDF). Vitae will automatically extract and score all your publications and activities.
-            </p>
-            <input 
-              type="file" 
-              accept="application/pdf" 
-              className="hidden" 
-              ref={fileInputRef} 
-              onChange={handleResumeUpload} 
-            />
-            <Button 
-              size="sm" 
-              onClick={() => fileInputRef.current?.click()} 
-              disabled={parsing} 
-              loading={parsing} 
-              variant="secondary" 
-              className="w-full border-blue/30 hover:border-blue hover:text-blue"
-            >
-              {parsing ? "Analyzing PDF..." : "Upload Resume (PDF)"}
-            </Button>
+          {/* Manual Entry */}
+          <div className="p-6 bg-surface-1 border border-rule rounded-xl shadow-sm flex flex-col justify-between hover:border-rule-strong transition-colors">
+            <div className="mb-6">
+              <h3 className="text-lg font-medium text-text mb-2 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-secondary"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                Manual Entry
+              </h3>
+              <p className="text-[13px] text-text-tertiary leading-relaxed">
+                Log records individually into your dossier for immediate scoring.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={() => setPubModalOpen(true)} className="flex-1 px-0 text-sm">
+                + Publication
+              </Button>
+              <Button variant="secondary" onClick={() => setActModalOpen(true)} className="flex-1 px-0 text-sm">
+                + Activity
+              </Button>
+            </div>
           </div>
 
-          <div className="shrink-0 p-5 bg-surface-1 border border-rule rounded-[4px] shadow-sm">
-            <h3 className="text-[15px] font-medium text-text mb-2 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-              External sync
-            </h3>
-            <p className="text-[13px] text-text-tertiary mb-4 leading-relaxed">
-              Auto-fetch publications from Google Scholar or import a Scopus CSV export.
-            </p>
-            
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <input
-                  placeholder="Scholar Profile ID (e.g. jX...)"
-                  value={scholarId}
-                  onChange={(e) => setScholarId(e.target.value)}
-                  className="text-sm py-2"
-                />
-                <Button size="sm" onClick={handleScholarSync} disabled={syncing} loading={syncing} variant="secondary">
-                  {syncing ? "Syncing..." : "Sync Scholar"}
+          {/* External Sync */}
+          <div className="p-6 bg-surface-1 border border-rule rounded-xl shadow-sm flex flex-col justify-between hover:border-rule-strong transition-colors">
+            <div className="mb-4">
+              <h3 className="text-lg font-medium text-text mb-2 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                External Sync
+              </h3>
+            </div>
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-2">
+                <input placeholder="Scholar ID" value={scholarId} onChange={(e) => setScholarId(e.target.value)} className="text-sm py-1.5 flex-1 min-w-0 px-2" />
+                <Button size="sm" onClick={handleScholarSync} disabled={syncing} loading={syncing} variant="secondary" className="px-3 shrink-0">
+                  Sync
                 </Button>
               </div>
-
-              <div className="border-t border-rule pt-4">
-                <input 
-                  type="file" 
-                  accept=".csv" 
-                  className="hidden" 
-                  ref={scopusFileInputRef} 
-                  onChange={handleScopusUpload} 
-                />
-                <Button 
-                  size="sm" 
-                  onClick={() => scopusFileInputRef.current?.click()} 
-                  disabled={scopusUploading} 
-                  loading={scopusUploading} 
-                  variant="secondary" 
-                  className="w-full"
-                >
+              <div className="flex items-center gap-2">
+                <input type="file" accept=".csv" className="hidden" ref={scopusFileInputRef} onChange={handleScopusUpload} />
+                <Button size="sm" onClick={() => scopusFileInputRef.current?.click()} disabled={scopusUploading} loading={scopusUploading} variant="secondary" className="w-full text-xs">
                   {scopusUploading ? "Importing..." : "Upload Scopus CSV"}
                 </Button>
               </div>
             </div>
           </div>
-        </aside>
 
-        {/* Center Col: unified Chronological Feed */}
-        <section className="flex-1 flex flex-col min-w-0">
-          <div className="flex items-end justify-between pb-4 border-b border-rule-strong mb-6 shrink-0">
-            <div>
-              <h1 className="text-3xl font-display text-blue">Dossier feed</h1>
-              <p className="text-[14px] text-text-tertiary mt-1">Chronological record of your work</p>
+          {/* Document Generation */}
+          <div className="p-6 bg-surface-1 border border-rule rounded-xl shadow-sm flex flex-col justify-between hover:border-rule-strong transition-colors">
+            <div className="mb-6">
+              <h3 className="text-lg font-medium text-text mb-2 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brown"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Appraisal Document
+              </h3>
+              <p className="text-[13px] text-text-tertiary leading-relaxed">
+                Generate official PBAS Proforma for {ACADEMIC_YEAR}.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button onClick={handleSubmitAppraisal} loading={submitting} disabled={submitting} className="w-full text-sm py-1.5 min-h-[36px]">
+                {appraisal ? "Recalculate Record" : "Compile Appraisal"}
+              </Button>
+              {appraisal && (
+                <div className="flex gap-2 w-full">
+                  <Button variant="secondary" onClick={() => handleDownloadPdf(true)} className="flex-1 px-0 flex gap-2 text-xs py-1.5 min-h-[32px]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Preview
+                  </Button>
+                  <Button variant="secondary" onClick={() => handleDownloadPdf(false)} className="flex-1 px-0 flex gap-2 text-xs py-1.5 min-h-[32px]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                    Download
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="flex-1 pr-2 pb-10">
+        </section>
+
+        {/* 3. DOSSIER FEED (Centered Single Column) */}
+        <section className="w-full max-w-5xl mx-auto mt-4">
+          <div className="flex items-end justify-between pb-4 border-b border-rule-strong mb-8">
+            <div>
+              <h2 className="text-3xl font-display text-text">Dossier chronology</h2>
+              <p className="text-[14px] text-text-tertiary mt-1">Comprehensive timeline of your academic contributions</p>
+            </div>
+            <div className="hidden sm:block text-right">
+              <span className="text-2xl font-mono text-text">{feed.length}</span>
+              <span className="block text-[11px] text-text-tertiary uppercase tracking-wider">Total Records</span>
+            </div>
+          </div>
+
+          <div className="pb-20">
             {loading ? (
               <p className="text-sm text-text-tertiary py-10 text-center animate-pulse-gentle">Loading dossier...</p>
             ) : feed.length === 0 ? (
               <EmptyState message="No records found in your dossier." action={{ label: "Add publication", onClick: () => setPubModalOpen(true) }} />
             ) : (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-5">
                 {feed.map((item, i) => (
-                  <div key={`${item.type}-${item.id}`} className={`p-5 bg-surface-1 border border-rule rounded-[4px] shadow-sm hover:border-rule-strong transition-colors animate-in stagger-${(i % 4) + 1}`}>
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="text-[16px] font-medium text-text leading-snug pr-4">{item.title}</h4>
-                      <div className="flex flex-col items-end shrink-0">
+                  <div key={`${item.type}-${item.id}`} className={`p-6 bg-surface-1 border border-rule rounded-xl shadow-sm hover:border-rule-strong hover:shadow-md transition-all animate-in stagger-${(i % 4) + 1}`}>
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="text-[17px] font-medium text-text leading-snug pr-6">{item.title}</h4>
+                      <div className="flex flex-col items-end shrink-0 bg-base px-3 py-2 rounded-lg border border-rule">
                         <span className="font-mono text-xl text-blue leading-none">{item.score}</span>
-                        <span className="text-[11px] font-mono text-text-tertiary mt-1">PTS</span>
+                        <span className="text-[10px] font-bold text-text-tertiary mt-1 uppercase">Points</span>
                       </div>
                     </div>
-                    <div className="flex flex-wrap items-center justify-between gap-4 mt-4 pt-4 border-t border-rule-subtle">
-                      <div className="flex items-center gap-3">
-                        <span className="px-2 py-1 bg-surface-2 text-[12px] font-medium text-text-secondary rounded-[3px]">
+                    <div className="flex flex-wrap items-center justify-between gap-4 mt-5 pt-4 border-t border-rule-subtle">
+                      <div className="flex items-center gap-4">
+                        <span className="px-2.5 py-1 bg-surface-2 text-[12px] font-semibold text-text-secondary rounded-[4px]">
                           {item.meta}
                         </span>
-                        <span className="text-[13px] text-text-tertiary truncate max-w-[200px] sm:max-w-[300px]">
+                        <span className="text-[14px] text-text-tertiary truncate max-w-[200px] sm:max-w-[400px]">
                           {item.submeta}
                         </span>
                         {item.date_val > 0 && (
-                          <span className="text-[13px] font-mono text-text-tertiary">
-                            • {item.date_val}
+                          <span className="text-[13px] font-mono text-text-tertiary flex items-center gap-1.5">
+                            <div className="w-1 h-1 rounded-full bg-rule-strong"></div> {item.date_val}
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => item.type === "publication" ? startEditPub(item) : startEditAct(item)}
-                          className="text-text-ghost hover:text-blue transition-colors"
-                          title="Edit"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                      <div className="flex items-center gap-4">
+                        <button onClick={() => item.type === "publication" ? startEditPub(item) : startEditAct(item)} className="text-text-ghost hover:text-blue transition-colors flex items-center gap-1.5 text-xs font-medium" title="Edit">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> Edit
                         </button>
-                        <button
-                          onClick={() => handleDelete(item.type, item.id)}
-                          className="text-text-ghost hover:text-coral transition-colors"
-                          title="Remove"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        <button onClick={() => handleDelete(item.type, item.id)} className="text-text-ghost hover:text-coral transition-colors flex items-center gap-1.5 text-xs font-medium" title="Remove">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Remove
                         </button>
                       </div>
                     </div>
@@ -523,123 +615,6 @@ export default function DashboardPage() {
             )}
           </div>
         </section>
-
-        {/* Right Col: Ledger & Roadmap */}
-        <aside className="w-full md:w-[300px] shrink-0 flex flex-col gap-6 sticky top-8 h-fit">
-          {casReadiness && (
-            <div className="shrink-0 p-6 bg-surface-1 border border-blue/30 rounded-[4px] shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue to-orange" />
-              <h2 className="text-xl font-display text-text mb-2 flex items-center gap-2">
-                CAS Roadmap
-              </h2>
-              <p className="text-[13px] text-text-tertiary mb-5 leading-tight">
-                {casReadiness.current_level} → {casReadiness.target_level}
-              </p>
-              
-              <div className="flex flex-col gap-4">
-                <div className="w-full bg-rule rounded-full h-2">
-                  <div 
-                    className="bg-blue h-2 rounded-full transition-all duration-500" 
-                    style={{ width: `${casReadiness.progress_percentage}%` }}
-                  ></div>
-                </div>
-                
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between items-center text-[13px]">
-                    <span className="text-text-secondary">Years in service</span>
-                    <span className="font-mono text-text">{casReadiness.years_of_service_completed}/{casReadiness.years_of_service_required}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[13px]">
-                    <span className="text-text-secondary">Publications</span>
-                    <span className="font-mono text-text">{casReadiness.publications_completed}/{casReadiness.publications_required}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[13px]">
-                    <span className="text-text-secondary">Activities / Courses</span>
-                    <span className="font-mono text-text">{casReadiness.activities_completed}/{casReadiness.activities_required}</span>
-                  </div>
-                </div>
-                
-                <div className="pt-2">
-                  {casReadiness.is_ready ? (
-                    <div className="text-[13px] font-medium text-green bg-green/10 p-2 rounded text-center border border-green/20">
-                      Eligible for promotion!
-                    </div>
-                  ) : (
-                    <div className="text-[13px] text-text-tertiary text-center">
-                      Complete requirements to advance.
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="shrink-0 p-6 bg-surface-1 border border-rule-strong rounded-[4px] shadow-sm">
-            <h2 className="text-xl font-display text-blue border-b border-rule pb-3 mb-5">Score ledger</h2>
-            
-            <div className="flex flex-col gap-4 mb-6">
-              <div className="flex justify-between items-end">
-                <span className="text-sm font-medium text-text-secondary">Category I</span>
-                <span className="font-mono text-lg text-text">{appraisal?.category_i_score ?? 0}</span>
-              </div>
-              <div className="flex justify-between items-end">
-                <span className="text-sm font-medium text-text-secondary">Category II</span>
-                <span className="font-mono text-lg text-text">{appraisal?.category_ii_score ?? 0}</span>
-              </div>
-              <div className="flex justify-between items-end">
-                <span className="text-sm font-medium text-text-secondary">Category III</span>
-                <span className="font-mono text-lg text-text">{appraisal?.category_iii_score ?? 0}</span>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-rule mb-6">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-bold text-text">Total API</span>
-                <span className="font-mono text-3xl text-brown">{appraisal?.total_api_score ?? 0}</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3 mb-6">
-              {appraisal ? (
-                <>
-                  <div className="flex justify-between items-center">
-                    <span className="text-[13px] text-text-tertiary">Eligibility</span>
-                    <StatusBadge status={appraisal.eligible_for_cas} />
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-[13px] text-text-tertiary">Appraisal status</span>
-                    <StatusBadge status={appraisal.status} />
-                  </div>
-                </>
-              ) : (
-                <p className="text-[13px] text-text-tertiary italic">No appraisal submitted for {ACADEMIC_YEAR}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <Button
-                onClick={handleSubmitAppraisal}
-                loading={submitting}
-                disabled={submitting}
-                className="w-full"
-              >
-                {appraisal ? "Recalculate record" : "Submit appraisal"}
-              </Button>
-              {appraisal && (
-                <div className="flex gap-2 w-full">
-                  <Button variant="secondary" onClick={() => handleDownloadPdf(true)} className="flex-1 px-0 flex gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                    Preview
-                  </Button>
-                  <Button variant="secondary" onClick={() => handleDownloadPdf(false)} className="flex-1 px-0 flex gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                    Download
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        </aside>
 
       </main>
 
