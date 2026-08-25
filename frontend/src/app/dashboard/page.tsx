@@ -368,14 +368,14 @@ export default function DashboardPage() {
   /* ------------------------------------------------------------ render */
 
   return (
-    <div className="min-h-screen flex flex-col bg-base overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-base">
       <TopBar />
       <ToastContainer />
 
-      <main className="flex-1 max-w-[1400px] w-full mx-auto px-6 md:px-8 flex flex-col md:flex-row gap-8 lg:gap-12 py-8 overflow-hidden">
+      <main className="flex-1 max-w-[1400px] w-full mx-auto px-6 md:px-8 flex flex-col md:flex-row gap-8 lg:gap-12 py-8">
         
         {/* Left Col: Actions & Tools */}
-        <aside className="w-full md:w-[280px] shrink-0 flex flex-col gap-8 md:h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar">
+        <aside className="w-full md:w-[280px] shrink-0 flex flex-col gap-8 sticky top-8 h-fit">
           <div className="shrink-0">
             <h2 className="text-xl font-display text-blue mb-4">Quick actions</h2>
             <div className="flex flex-col gap-3 mb-6">
@@ -462,7 +462,7 @@ export default function DashboardPage() {
         </aside>
 
         {/* Center Col: unified Chronological Feed */}
-        <section className="flex-1 flex flex-col min-w-0 md:h-[calc(100vh-8rem)]">
+        <section className="flex-1 flex flex-col min-w-0">
           <div className="flex items-end justify-between pb-4 border-b border-rule-strong mb-6 shrink-0">
             <div>
               <h1 className="text-3xl font-display text-blue">Dossier feed</h1>
@@ -470,7 +470,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto pr-2 no-scrollbar pb-10">
+          <div className="flex-1 pr-2 pb-10">
             {loading ? (
               <p className="text-sm text-text-tertiary py-10 text-center animate-pulse-gentle">Loading dossier...</p>
             ) : feed.length === 0 ? (
@@ -525,7 +525,7 @@ export default function DashboardPage() {
         </section>
 
         {/* Right Col: Ledger & Roadmap */}
-        <aside className="w-full md:w-[300px] shrink-0 flex flex-col gap-6 md:h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar">
+        <aside className="w-full md:w-[300px] shrink-0 flex flex-col gap-6 sticky top-8 h-fit">
           {casReadiness && (
             <div className="shrink-0 p-6 bg-surface-1 border border-blue/30 rounded-[4px] shadow-sm relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue to-orange" />
@@ -574,7 +574,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-          <div className="shrink-0 p-6 bg-surface-1 border border-rule-strong rounded-[4px] shadow-sm sticky top-0">
+          <div className="shrink-0 p-6 bg-surface-1 border border-rule-strong rounded-[4px] shadow-sm">
             <h2 className="text-xl font-display text-blue border-b border-rule pb-3 mb-5">Score ledger</h2>
             
             <div className="flex flex-col gap-4 mb-6">
