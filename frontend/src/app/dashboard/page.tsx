@@ -372,13 +372,13 @@ export default function DashboardPage() {
       <TopBar />
       <ToastContainer />
 
-                  <main className="flex-1 w-full px-6 md:px-12 py-10 flex flex-col xl:flex-row gap-12">
+                        <main className="flex-1 w-full px-6 md:px-12 py-10 flex flex-col xl:flex-row gap-12">
         
         {/* LEFT COLUMN: Hero & Feed */}
-        <div className="flex-1 min-w-0 flex flex-col gap-12">
+        <div className="w-full xl:w-[800px] 2xl:w-[900px] shrink-0 flex flex-col gap-12">
           
           {/* CAS ROADMAP HERO */}
-          <section className="w-full max-w-[1200px]">
+          <section className="w-full">
             {casReadiness ? (
               <div className="w-full bg-surface-1 border border-blue/20 rounded-lg shadow-sm relative">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-blue" />
@@ -417,7 +417,7 @@ export default function DashboardPage() {
                   {/* Right: The Score Ledger */}
                   <div className="lg:w-[320px] shrink-0 bg-base rounded-md p-6 border border-rule shadow-inner flex flex-col gap-5 relative">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-text-secondary uppercase tracking-widest">Total API Score</span>
+                      <span className="text-xs font-bold text-text-secondary uppercase tracking-widest">Total API</span>
                       <span className="font-mono text-4xl text-blue font-bold">{appraisal?.total_api_score ?? 0}</span>
                     </div>
                     
@@ -440,11 +440,11 @@ export default function DashboardPage() {
                       {casReadiness.is_ready ? (
                         <span className="text-[12px] font-bold text-green flex items-center gap-2">
                           <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-green"></span></span>
-                          Eligible for Promotion
+                          Ready
                         </span>
                       ) : (
                         <span className="text-[12px] font-medium text-orange flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-orange"></div> Requirements Pending
+                          <div className="w-2 h-2 rounded-full bg-orange"></div> Pending
                         </span>
                       )}
                       {appraisal && <StatusBadge status={appraisal.status} />}
@@ -461,7 +461,7 @@ export default function DashboardPage() {
           </section>
 
           {/* DOSSIER FEED */}
-          <section className="w-full max-w-[1200px]">
+          <section className="w-full">
             <div className="flex items-end justify-between pb-4 border-b border-rule-strong mb-8">
               <div>
                 <h2 className="text-2xl font-display text-text">Dossier Chronology</h2>
@@ -521,78 +521,124 @@ export default function DashboardPage() {
 
         </div>
 
-        {/* MIDDLE COLUMN: Analytics (Only visible on 2xl screens / zoomed out) */}
-        <div className="hidden 2xl:flex flex-col gap-8 w-[360px] shrink-0 border-l border-r border-rule px-8">
-          <div className="pb-3 border-b border-rule-strong mb-2">
-            <h2 className="text-lg font-display text-text">Dossier Analytics</h2>
+        {/* MIDDLE COLUMN: Expandable Analytics (Absorbs empty space) */}
+        <div className="hidden 2xl:flex flex-col flex-1 min-w-[360px] border-l border-r border-rule px-8">
+          <div className="pb-3 border-b border-rule-strong mb-6">
+            <h2 className="text-lg font-display text-text">Dossier Analytics Engine</h2>
+            <p className="text-[11px] text-text-tertiary mt-1">Real-time breakdown of UGC PBAS trajectory</p>
           </div>
 
-          {/* Stat 1: Score Distribution */}
-          <div className="flex flex-col gap-4">
-            <h3 className="text-[12px] font-bold text-text-secondary uppercase tracking-widest">API Distribution</h3>
+          <div className="grid grid-cols-1 min-[2200px]:grid-cols-2 gap-10">
             
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-col gap-1.5">
-                <div className="flex justify-between text-[11px] font-medium text-text-tertiary">
-                  <span>Cat I (Teaching)</span>
-                  <span className="font-mono">{appraisal?.category_i_score ?? 0} / 100</span>
-                </div>
-                <div className="w-full bg-rule h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-blue h-full" style={{ width: `${Math.min(((appraisal?.category_i_score ?? 0) / 100) * 100, 100)}%` }} />
+            {/* Core Stats (Always visible) */}
+            <div className="flex flex-col gap-8">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-[12px] font-bold text-text-secondary uppercase tracking-widest">API Distribution</h3>
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex justify-between text-[11px] font-medium text-text-tertiary">
+                      <span>Cat I (Teaching)</span>
+                      <span className="font-mono">{appraisal?.category_i_score ?? 0} / 100</span>
+                    </div>
+                    <div className="w-full bg-rule h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-blue h-full" style={{ width: `${Math.min(((appraisal?.category_i_score ?? 0) / 100) * 100, 100)}%` }} />
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col gap-1.5 mt-2">
+                    <div className="flex justify-between text-[11px] font-medium text-text-tertiary">
+                      <span>Cat II (Activities)</span>
+                      <span className="font-mono">{appraisal?.category_ii_score ?? 0} / 50</span>
+                    </div>
+                    <div className="w-full bg-rule h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-orange h-full" style={{ width: `${Math.min(((appraisal?.category_ii_score ?? 0) / 50) * 100, 100)}%` }} />
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col gap-1.5 mt-2">
+                    <div className="flex justify-between text-[11px] font-medium text-text-tertiary">
+                      <span>Cat III (Research)</span>
+                      <span className="font-mono">{appraisal?.category_iii_score ?? 0} / 150</span>
+                    </div>
+                    <div className="w-full bg-rule h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-brown h-full" style={{ width: `${Math.min(((appraisal?.category_iii_score ?? 0) / 150) * 100, 100)}%` }} />
+                    </div>
+                  </div>
                 </div>
               </div>
-              
-              <div className="flex flex-col gap-1.5 mt-2">
-                <div className="flex justify-between text-[11px] font-medium text-text-tertiary">
-                  <span>Cat II (Activities)</span>
-                  <span className="font-mono">{appraisal?.category_ii_score ?? 0} / 50</span>
-                </div>
-                <div className="w-full bg-rule h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-orange h-full" style={{ width: `${Math.min(((appraisal?.category_ii_score ?? 0) / 50) * 100, 100)}%` }} />
-                </div>
-              </div>
-              
-              <div className="flex flex-col gap-1.5 mt-2">
-                <div className="flex justify-between text-[11px] font-medium text-text-tertiary">
-                  <span>Cat III (Research)</span>
-                  <span className="font-mono">{appraisal?.category_iii_score ?? 0} / 150</span>
-                </div>
-                <div className="w-full bg-rule h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-brown h-full" style={{ width: `${Math.min(((appraisal?.category_iii_score ?? 0) / 150) * 100, 100)}%` }} />
+
+              <div className="flex flex-col gap-4 pt-6 border-t border-rule-subtle">
+                <h3 className="text-[12px] font-bold text-text-secondary uppercase tracking-widest">Record Volume</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-surface-1 border border-rule rounded-md p-4 flex flex-col justify-center items-center text-center">
+                    <span className="font-mono text-2xl text-blue">{feed.filter(f => f.type === 'publication').length}</span>
+                    <span className="text-[10px] text-text-tertiary uppercase mt-1 font-semibold">Publications</span>
+                  </div>
+                  <div className="bg-surface-1 border border-rule rounded-md p-4 flex flex-col justify-center items-center text-center">
+                    <span className="font-mono text-2xl text-brown">{feed.filter(f => f.type === 'activity').length}</span>
+                    <span className="text-[10px] text-text-tertiary uppercase mt-1 font-semibold">Activities</span>
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* Deep Analytics (Appears only on ultra-wide screens < 50% zoom) */}
+            <div className="hidden min-[2200px]:flex flex-col gap-8 border-l border-rule-subtle pl-10">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-[12px] font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-orange rounded-full animate-pulse" />
+                  Gap Analysis
+                </h3>
+                <div className="bg-orange/5 border border-orange/20 rounded-md p-4">
+                  <p className="text-[12px] text-text-secondary leading-relaxed mb-3">
+                    To meet the requirements for <span className="font-bold text-text">{casReadiness?.target_level ?? 'next level'}</span>, the system has identified the following immediate deficits:
+                  </p>
+                  <ul className="flex flex-col gap-2">
+                    {casReadiness?.publications_completed < casReadiness?.publications_required && (
+                      <li className="flex items-start gap-2 text-[12px] text-text-tertiary">
+                        <svg className="w-3.5 h-3.5 mt-0.5 text-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        Deficit of {casReadiness?.publications_required - casReadiness?.publications_completed} recognized publications.
+                      </li>
+                    )}
+                    {casReadiness?.activities_completed < casReadiness?.activities_required && (
+                      <li className="flex items-start gap-2 text-[12px] text-text-tertiary">
+                        <svg className="w-3.5 h-3.5 mt-0.5 text-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        Deficit of {casReadiness?.activities_required - casReadiness?.activities_completed} Category I/II activities.
+                      </li>
+                    )}
+                    {(casReadiness?.publications_completed >= casReadiness?.publications_required) && (casReadiness?.activities_completed >= casReadiness?.activities_required) && (
+                      <li className="flex items-start gap-2 text-[12px] text-green">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                        No quantitative deficits detected.
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <h3 className="text-[12px] font-bold text-text-secondary uppercase tracking-widest">Citation Velocity</h3>
+                <div className="h-24 flex items-end gap-1.5 opacity-80">
+                  {/* Mock bar chart representing citation velocity */}
+                  {[12, 18, 14, 25, 20, 35, 42, 38, 55, 60, 48, 65, 75, 82].map((val, idx) => (
+                    <div key={idx} className="flex-1 bg-brown/80 rounded-t-sm transition-all hover:bg-brown hover:opacity-100" style={{ height: `${val}%` }} />
+                  ))}
+                </div>
+                <div className="flex justify-between text-[9px] font-mono text-text-ghost uppercase">
+                  <span>2020</span>
+                  <span>Present</span>
+                </div>
+              </div>
+            </div>
+
           </div>
 
-          {/* Stat 2: Platform Activity */}
-          <div className="flex flex-col gap-4 mt-4 pt-6 border-t border-rule-subtle">
-            <h3 className="text-[12px] font-bold text-text-secondary uppercase tracking-widest">Record Volume</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-surface-1 border border-rule rounded-md p-4 flex flex-col justify-center items-center text-center">
-                <span className="font-mono text-2xl text-blue">{feed.filter(f => f.type === 'publication').length}</span>
-                <span className="text-[10px] text-text-tertiary uppercase mt-1 font-semibold">Publications</span>
-              </div>
-              <div className="bg-surface-1 border border-rule rounded-md p-4 flex flex-col justify-center items-center text-center">
-                <span className="font-mono text-2xl text-brown">{feed.filter(f => f.type === 'activity').length}</span>
-                <span className="text-[10px] text-text-tertiary uppercase mt-1 font-semibold">Activities</span>
-              </div>
-            </div>
+          <div className="mt-auto pt-6 border-t border-rule-subtle flex justify-between items-center text-[11px] font-mono text-text-ghost">
+            <span className="flex items-center gap-1.5 text-green">
+               <span className="w-1.5 h-1.5 rounded-full bg-green" /> LIVE PIPELINE
+            </span>
+            <span>v2025.1.0</span>
           </div>
-          
-          {/* System Status */}
-          <div className="mt-auto pt-6 border-t border-rule-subtle">
-            <div className="flex justify-between items-center text-[11px] font-mono text-text-ghost">
-              <span>SYNC STATUS</span>
-              <span className="flex items-center gap-1.5 text-green">
-                 <span className="w-1.5 h-1.5 rounded-full bg-green" /> ONLINE
-              </span>
-            </div>
-            <div className="flex justify-between items-center text-[11px] font-mono text-text-ghost mt-2">
-              <span>UGC RULESET</span>
-              <span>v2025.1</span>
-            </div>
-          </div>
-
         </div>
 
         {/* RIGHT COLUMN: Action Ribbon Tools */}
