@@ -4,7 +4,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.lib import colors
 from reportlab.platypus import (
-    SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+    SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, KeepTogether
 )
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_RIGHT
@@ -198,15 +198,16 @@ def build_appraisal_pdf(faculty, appraisal, publications, activities) -> bytes:
     elements.append(Spacer(1, 30))
     
     # --- PART D: DECLARATION ---
-    elements.append(Paragraph("PART D: DECLARATION", part_heading_style))
+    declaration_elements = []
+    declaration_elements.append(Paragraph("PART D: DECLARATION", part_heading_style))
     
     declaration_text = """
     I certify that the information provided is correct as per records available with the University and/or documents enclosed along with the duly filled PBAS proforma. 
     I understand that any false information will result in disciplinary action against me.
     """
-    elements.append(Paragraph(declaration_text, normal_style))
+    declaration_elements.append(Paragraph(declaration_text, normal_style))
     
-    elements.append(Spacer(1, 40))
+    declaration_elements.append(Spacer(1, 40))
     
     sig_data = [
         [f"Place: _________________", f"Signature of the Faculty: _________________"],
@@ -217,20 +218,22 @@ def build_appraisal_pdf(faculty, appraisal, publications, activities) -> bytes:
         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
         ('TOPPADDING', (0, 0), (-1, -1), 10),
     ]))
-    elements.append(sig_table)
+    declaration_elements.append(sig_table)
+    elements.append(KeepTogether(declaration_elements))
     
     elements.append(Spacer(1, 50))
     
     # --- PART E: FORWARDING ---
-    elements.append(Paragraph("FORWARDING REMARKS", part_heading_style))
+    forwarding_elements = []
+    forwarding_elements.append(Paragraph("FORWARDING REMARKS", part_heading_style))
     
     forward_text = f"""
     The statements made by {faculty.name}, {faculty.designation} in the Department of {faculty.department} 
     are verified from the records of the institution and found to be correct.
     """
-    elements.append(Paragraph(forward_text, normal_style))
+    forwarding_elements.append(Paragraph(forward_text, normal_style))
     
-    elements.append(Spacer(1, 50))
+    forwarding_elements.append(Spacer(1, 50))
     
     hod_data = [
         ["Signature of HOD / Chairperson", "Signature of the Principal / Director"],
@@ -242,7 +245,8 @@ def build_appraisal_pdf(faculty, appraisal, publications, activities) -> bytes:
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('TOPPADDING', (0, 0), (-1, -1), 5),
     ]))
-    elements.append(hod_table)
+    forwarding_elements.append(hod_table)
+    elements.append(KeepTogether(forwarding_elements))
 
     doc.build(elements)
     return buffer.getvalue()
