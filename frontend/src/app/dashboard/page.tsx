@@ -521,6 +521,80 @@ export default function DashboardPage() {
 
         </div>
 
+        {/* MIDDLE COLUMN: Analytics (Only visible on 2xl screens / zoomed out) */}
+        <div className="hidden 2xl:flex flex-col gap-8 w-[360px] shrink-0 border-l border-r border-rule px-8">
+          <div className="pb-3 border-b border-rule-strong mb-2">
+            <h2 className="text-lg font-display text-text">Dossier Analytics</h2>
+          </div>
+
+          {/* Stat 1: Score Distribution */}
+          <div className="flex flex-col gap-4">
+            <h3 className="text-[12px] font-bold text-text-secondary uppercase tracking-widest">API Distribution</h3>
+            
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1.5">
+                <div className="flex justify-between text-[11px] font-medium text-text-tertiary">
+                  <span>Cat I (Teaching)</span>
+                  <span className="font-mono">{appraisal?.category_i_score ?? 0} / 100</span>
+                </div>
+                <div className="w-full bg-rule h-1.5 rounded-full overflow-hidden">
+                  <div className="bg-blue h-full" style={{ width: `${Math.min(((appraisal?.category_i_score ?? 0) / 100) * 100, 100)}%` }} />
+                </div>
+              </div>
+              
+              <div className="flex flex-col gap-1.5 mt-2">
+                <div className="flex justify-between text-[11px] font-medium text-text-tertiary">
+                  <span>Cat II (Activities)</span>
+                  <span className="font-mono">{appraisal?.category_ii_score ?? 0} / 50</span>
+                </div>
+                <div className="w-full bg-rule h-1.5 rounded-full overflow-hidden">
+                  <div className="bg-orange h-full" style={{ width: `${Math.min(((appraisal?.category_ii_score ?? 0) / 50) * 100, 100)}%` }} />
+                </div>
+              </div>
+              
+              <div className="flex flex-col gap-1.5 mt-2">
+                <div className="flex justify-between text-[11px] font-medium text-text-tertiary">
+                  <span>Cat III (Research)</span>
+                  <span className="font-mono">{appraisal?.category_iii_score ?? 0} / 150</span>
+                </div>
+                <div className="w-full bg-rule h-1.5 rounded-full overflow-hidden">
+                  <div className="bg-brown h-full" style={{ width: `${Math.min(((appraisal?.category_iii_score ?? 0) / 150) * 100, 100)}%` }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stat 2: Platform Activity */}
+          <div className="flex flex-col gap-4 mt-4 pt-6 border-t border-rule-subtle">
+            <h3 className="text-[12px] font-bold text-text-secondary uppercase tracking-widest">Record Volume</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-surface-1 border border-rule rounded-md p-4 flex flex-col justify-center items-center text-center">
+                <span className="font-mono text-2xl text-blue">{feed.filter(f => f.type === 'publication').length}</span>
+                <span className="text-[10px] text-text-tertiary uppercase mt-1 font-semibold">Publications</span>
+              </div>
+              <div className="bg-surface-1 border border-rule rounded-md p-4 flex flex-col justify-center items-center text-center">
+                <span className="font-mono text-2xl text-brown">{feed.filter(f => f.type === 'activity').length}</span>
+                <span className="text-[10px] text-text-tertiary uppercase mt-1 font-semibold">Activities</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* System Status */}
+          <div className="mt-auto pt-6 border-t border-rule-subtle">
+            <div className="flex justify-between items-center text-[11px] font-mono text-text-ghost">
+              <span>SYNC STATUS</span>
+              <span className="flex items-center gap-1.5 text-green">
+                 <span className="w-1.5 h-1.5 rounded-full bg-green" /> ONLINE
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-[11px] font-mono text-text-ghost mt-2">
+              <span>UGC RULESET</span>
+              <span>v2025.1</span>
+            </div>
+          </div>
+
+        </div>
+
         {/* RIGHT COLUMN: Action Ribbon Tools */}
         <aside className="w-full xl:w-[320px] shrink-0 flex flex-col gap-6">
           <div className="pb-3 border-b border-rule-strong mb-2">
