@@ -414,76 +414,60 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   
-                  {/* Right Blocks Wrapper */}
-                  <div className="flex flex-col gap-5 shrink-0 w-full md:w-[280px]">
-                    {/* Middle: The Score Ledger */}
-                    <div className="w-full shrink-0 bg-base rounded-md p-5 border border-rule shadow-inner flex flex-col gap-4 relative">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs font-bold text-text-secondary uppercase tracking-widest">Total API</span>
-                        <span className="font-mono text-4xl text-blue font-bold">{appraisal?.total_api_score ?? 0}</span>
+                  {/* Right: The Score Ledger & Document Generator */}
+                  <div className="w-full xl:w-[280px] shrink-0 bg-base rounded-md p-5 border border-rule shadow-inner flex flex-col gap-4 relative">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-text-secondary uppercase tracking-widest">Total API</span>
+                      <span className="font-mono text-4xl text-blue font-bold">{appraisal?.total_api_score ?? 0}</span>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-2 py-3 border-y border-rule text-left">
+                      <div>
+                        <span className="block text-[10px] text-text-tertiary uppercase font-bold tracking-wider mb-1">Cat I</span>
+                        <span className="font-mono text-lg text-text">{appraisal?.category_i_score ?? 0}</span>
                       </div>
-                      
-                      <div className="grid grid-cols-3 gap-2 py-3 border-y border-rule text-left">
-                        <div>
-                          <span className="block text-[10px] text-text-tertiary uppercase font-bold tracking-wider mb-1">Cat I</span>
-                          <span className="font-mono text-lg text-text">{appraisal?.category_i_score ?? 0}</span>
-                        </div>
-                        <div className="border-x border-rule px-2">
-                          <span className="block text-[10px] text-text-tertiary uppercase font-bold tracking-wider mb-1">Cat II</span>
-                          <span className="font-mono text-lg text-text">{appraisal?.category_ii_score ?? 0}</span>
-                        </div>
-                        <div className="pl-2">
-                          <span className="block text-[10px] text-text-tertiary uppercase font-bold tracking-wider mb-1">Cat III</span>
-                          <span className="font-mono text-lg text-text">{appraisal?.category_iii_score ?? 0}</span>
-                        </div>
+                      <div className="border-x border-rule px-2">
+                        <span className="block text-[10px] text-text-tertiary uppercase font-bold tracking-wider mb-1">Cat II</span>
+                        <span className="font-mono text-lg text-text">{appraisal?.category_ii_score ?? 0}</span>
                       </div>
-                      
-                      <div className="flex justify-between items-center mt-auto">
-                        {casReadiness.is_ready ? (
-                          <span className="text-[11px] font-bold text-green flex items-center gap-1.5">
-                            <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-green"></span></span>
-                            Ready
-                          </span>
-                        ) : (
-                          <span className="text-[11px] font-medium text-orange flex items-center gap-1.5">
-                            <div className="w-2 h-2 rounded-full bg-orange"></div> Pending
-                          </span>
-                        )}
-                        {appraisal && <StatusBadge status={appraisal.status} />}
+                      <div className="pl-2">
+                        <span className="block text-[10px] text-text-tertiary uppercase font-bold tracking-wider mb-1">Cat III</span>
+                        <span className="font-mono text-lg text-text">{appraisal?.category_iii_score ?? 0}</span>
                       </div>
                     </div>
+                    
+                    <div className="flex justify-between items-center">
+                      {casReadiness.is_ready ? (
+                        <span className="text-[11px] font-bold text-green flex items-center gap-1.5">
+                          <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-green"></span></span>
+                          Ready
+                        </span>
+                      ) : (
+                        <span className="text-[11px] font-medium text-orange flex items-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full bg-orange"></div> Pending
+                        </span>
+                      )}
+                      {appraisal && <StatusBadge status={appraisal.status} />}
+                    </div>
 
-                    {/* Right: Appraisal Document Generator */}
-                    <div className="w-full shrink-0 bg-surface-1 border border-rule rounded-md p-5 shadow-sm flex flex-col justify-between">
-                      <div className="mb-4">
-                        <h3 className="text-[13px] font-bold text-text-secondary uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brown"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                          Proforma
-                        </h3>
-                        <p className="text-[11px] text-text-tertiary leading-relaxed">
-                          Generate PBAS for <span className="font-mono">{ACADEMIC_YEAR}</span>
-                        </p>
-                      </div>
-                      <div className="flex flex-col gap-2 mt-auto">
-                        <Button onClick={handleSubmitAppraisal} loading={submitting} disabled={submitting} className="w-full text-[11px] py-1 min-h-[30px]">
-                          {appraisal ? "Recalculate Record" : "Compile Appraisal"}
-                        </Button>
-                        {appraisal && (
-                          <div className="flex gap-2 w-full mt-1">
-                            <Button variant="secondary" onClick={() => handleDownloadPdf(true)} className="flex-1 px-0 flex gap-1.5 text-[10px] py-1 min-h-[26px]">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                              Preview
-                            </Button>
-                            <Button variant="secondary" onClick={() => handleDownloadPdf(false)} className="flex-1 px-0 flex gap-1.5 text-[10px] py-1 min-h-[26px]">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                              Download
-                            </Button>
-                          </div>
-                        )}
-                      </div>
+                    <div className="flex flex-col gap-2 pt-4 border-t border-rule mt-auto">
+                      <Button onClick={handleSubmitAppraisal} loading={submitting} disabled={submitting} className="w-full text-[11px] py-1 min-h-[30px]">
+                        {appraisal ? "Recalculate Record" : "Compile Appraisal"}
+                      </Button>
+                      {appraisal && (
+                        <div className="flex gap-2 w-full mt-1">
+                          <Button variant="secondary" onClick={() => handleDownloadPdf(true)} className="flex-1 px-0 flex gap-1.5 justify-center items-center text-[10px] py-1 min-h-[26px]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Preview
+                          </Button>
+                          <Button variant="secondary" onClick={() => handleDownloadPdf(false)} className="flex-1 px-0 flex gap-1.5 justify-center items-center text-[10px] py-1 min-h-[26px]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            Download
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
-
                 </div>
               </div>
             ) : (
