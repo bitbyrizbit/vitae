@@ -522,7 +522,7 @@ export default function DashboardPage() {
         </div>
 
         {/* RIGHT COLUMN: Action Ribbon Tools */}
-        <aside className="w-full xl:w-[320px] shrink-0 flex flex-col gap-6 sticky top-10 h-fit">
+        <aside className="w-full xl:w-[320px] shrink-0 flex flex-col gap-6">
           <div className="pb-3 border-b border-rule-strong mb-2">
             <h2 className="text-lg font-display text-text">Command Tools</h2>
           </div>
