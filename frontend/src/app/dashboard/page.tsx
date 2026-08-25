@@ -491,11 +491,11 @@ export default function DashboardPage() {
                 Log records individually into your dossier for immediate scoring.
               </p>
             </div>
-            <div className="flex gap-3">
-              <Button onClick={() => setPubModalOpen(true)} className="flex-1 px-0 text-sm">
+            <div className="flex gap-2">
+              <Button onClick={() => setPubModalOpen(true)} className="flex-1 px-0 text-[13px] whitespace-nowrap">
                 + Publication
               </Button>
-              <Button variant="secondary" onClick={() => setActModalOpen(true)} className="flex-1 px-0 text-sm">
+              <Button variant="secondary" onClick={() => setActModalOpen(true)} className="flex-1 px-0 text-[13px] whitespace-nowrap">
                 + Activity
               </Button>
             </div>
@@ -533,7 +533,7 @@ export default function DashboardPage() {
                 Appraisal Document
               </h3>
               <p className="text-[13px] text-text-tertiary leading-relaxed">
-                Generate official PBAS Proforma for {ACADEMIC_YEAR}.
+                Generate official PBAS Proforma for <span className="whitespace-nowrap">{ACADEMIC_YEAR}</span>.
               </p>
             </div>
             <div className="flex flex-col gap-2">
