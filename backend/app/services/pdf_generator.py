@@ -173,7 +173,7 @@ def build_appraisal_pdf(faculty, appraisal, publications, activities) -> bytes:
     elements.append(Paragraph("SUMMARY OF API SCORES", part_heading_style))
     
     sum_rows = [
-        [Paragraph("Category", bold_cell_style), Paragraph("Criteria", bold_cell_style), Paragraph("API Score Claimed", bold_cell_style)],
+        ["Category", "Criteria", "API Score Claimed"],
         ["I", Paragraph("Teaching, Learning and Evaluation", normal_cell_style), f"{appraisal.category_i_score}"],
         ["II", Paragraph("Co-curricular, Extension, Professional Development", normal_cell_style), f"{appraisal.category_ii_score}"],
         ["III", Paragraph("Research and Academic Contributions", normal_cell_style), f"{appraisal.category_iii_score}"],
