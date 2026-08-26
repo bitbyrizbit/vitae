@@ -9,7 +9,7 @@ class Settings:
     jwt_secret: str = os.getenv("JWT_SECRET", "change-this-in-prod")
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24 * 7  # 7 days, faculty shouldn't get logged out mid-appraisal
-    cors_origins: list[str] = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+    cors_origins: list[str] = os.getenv("CORS_ORIGINS", "http://localhost:3000,https://vitae-roan-tau.vercel.app").split(",")
 
 
 settings = Settings()
