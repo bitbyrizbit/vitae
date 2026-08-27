@@ -12,10 +12,10 @@ from app.models.activity import Activity
 from app.models.appraisal import Appraisal
 from app.schemas import (
     PublicationCreate, PublicationOut, ActivityCreate, ActivityOut,
-    AppraisalOut, ScholarLinkRequest, ResumeParseResult
+    AppraisalOut, ScholarLinkRequest, ResumeParseResult, UserOut
 )
 from app.services.pbas_engine import score_publication, score_activity, compute_appraisal_totals
-from app.services.scholar_scraper import fetch_scholar_publications
+from app.services.scholar_scraper import fetch_scholar_publications, extract_scholar_id
 from app.services.resume_parser import extract_data_from_resume
 from app.services.scopus_importer import parse_scopus_csv
 from app.services.cas_roadmap import evaluate_cas_readiness, CasReadinessResponse
@@ -26,13 +26,15 @@ router = APIRouter(prefix="/faculty", tags=["faculty"])
 
 @router.post("/me/resume-parse", response_model=ResumeParseResult)
 async def parse_resume(file: UploadFile = File(...), user: User = Depends(get_current_user)):
-    if file.content_type != "application/pdf":
+    if not (file.filename and file.filename.lower().endswith(".pdf")):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
-    
+
     contents = await file.read()
     try:
         result = extract_data_from_resume(contents)
         return result
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to parse resume: {str(e)}")
 
@@ -133,27 +135,50 @@ def edit_publication(pub_id: int, payload: PublicationCreate, user: User = Depen
     return pub
 
 
+@router.get("/me/profile", response_model=UserOut)
+def get_my_profile(user: User = Depends(get_current_user)):
+    return user
+
+
 @router.post("/me/scholar-link")
 def link_scholar_profile(payload: ScholarLinkRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    user.scholar_profile_id = payload.scholar_profile_id
+    clean_id = extract_scholar_id(payload.scholar_profile_id)
+    if not clean_id:
+        raise HTTPException(status_code=400, detail="Invalid Google Scholar Profile ID or URL")
+    user.scholar_profile_id = clean_id
     db.commit()
-    return {"linked": True, "scholar_profile_id": payload.scholar_profile_id}
+    return {"linked": True, "scholar_profile_id": clean_id}
 
 
 @router.post("/me/scholar-sync", response_model=list[PublicationOut])
 def sync_scholar_publications(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not user.scholar_profile_id:
-        raise HTTPException(status_code=400, detail="link a google scholar profile first")
+        raise HTTPException(status_code=400, detail="Link a Google Scholar profile first")
 
-    fetched = fetch_scholar_publications(user.scholar_profile_id)
+    clean_id = extract_scholar_id(user.scholar_profile_id)
+    try:
+        fetched = fetch_scholar_publications(clean_id)
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Google Scholar sync failed: {str(e)}")
+
     existing_ids = {
         p.scholar_pub_id for p in
         db.query(Publication).filter(Publication.faculty_id == user.id, Publication.source == "google_scholar").all()
+        if p.scholar_pub_id
+    }
+    existing_titles = {
+        p.title.strip().lower() for p in
+        db.query(Publication).filter(Publication.faculty_id == user.id).all()
+        if p.title
     }
 
     new_rows = []
     for pub in fetched:
-        if pub["scholar_pub_id"] in existing_ids:
+        if pub.get("scholar_pub_id") and pub["scholar_pub_id"] in existing_ids:
+            continue
+        if pub.get("title") and pub["title"].strip().lower() in existing_titles:
             continue
         row = Publication(faculty_id=user.id, **pub)
         db.add(row)

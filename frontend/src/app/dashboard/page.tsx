@@ -132,12 +132,17 @@ export default function DashboardPage() {
   async function loadData() {
     setLoading(true);
     try {
-      const [pubsRes, actsRes, appRes, casRes] = await Promise.all([
+      const [pubsRes, actsRes, appRes, casRes, profRes] = await Promise.all([
         api.get("/faculty/me/publications"),
         api.get("/faculty/me/activities"),
         api.get(`/faculty/me/appraisal/${ACADEMIC_YEAR}`).catch(() => ({ data: null })),
-        api.get("/faculty/me/cas-readiness").catch(() => ({ data: null }))
+        api.get("/faculty/me/cas-readiness").catch(() => ({ data: null })),
+        api.get("/faculty/me/profile").catch(() => ({ data: null })),
       ]);
+
+      if (profRes?.data?.scholar_profile_id) {
+        setScholarId((prev) => prev || profRes.data.scholar_profile_id);
+      }
       
       // Map to unified feed
       const pubs: FeedItem[] = pubsRes.data.map((p: any) => ({
@@ -254,17 +259,23 @@ export default function DashboardPage() {
   }
 
   async function handleScholarSync() {
+    if (!scholarId.trim()) {
+      addToast("Please enter a Google Scholar Profile ID or URL", "error");
+      return;
+    }
     setSyncing(true);
     try {
-      if (scholarId.trim()) {
-        await api.post("/faculty/me/scholar-link", { scholar_profile_id: scholarId.trim() });
-      }
+      await api.post("/faculty/me/scholar-link", { scholar_profile_id: scholarId.trim() });
       const res = await api.post("/faculty/me/scholar-sync");
       const count = res.data?.length || 0;
-      addToast(count > 0 ? `${count} new publications synced` : "No new publications found", count > 0 ? "success" : "info");
+      addToast(count > 0 ? `${count} new publications synced` : "Sync complete (no new publications)", count > 0 ? "success" : "info");
       loadData();
-    } catch { addToast("Sync failed. Check your profile ID.", "error"); }
-    setSyncing(false);
+    } catch (err: any) {
+      const msg = err?.response?.data?.detail || "Sync failed. Check your profile ID.";
+      addToast(msg, "error");
+    } finally {
+      setSyncing(false);
+    }
   }
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -299,9 +310,10 @@ export default function DashboardPage() {
 
       addToast(`Extracted ${publications.length} publications and ${activities.length} activities!`, "success");
       loadData();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      addToast("Failed to parse resume", "error");
+      const msg = err?.response?.data?.detail || "Failed to parse resume";
+      addToast(msg, "error");
     } finally {
       setParsing(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -712,7 +724,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex gap-2">
-                <input placeholder="Scholar ID" value={scholarId} onChange={(e) => setScholarId(e.target.value)} className="text-[12px] py-1 flex-1 min-w-0 px-2 rounded-sm border-rule" />
+                <input placeholder="Scholar ID or profile URL" value={scholarId} onChange={(e) => setScholarId(e.target.value)} className="text-[12px] py-1 flex-1 min-w-0 px-2 rounded-sm border-rule" />
                 <Button size="sm" onClick={handleScholarSync} disabled={syncing} loading={syncing} variant="secondary" className="px-3 shrink-0 text-[12px] py-1 min-h-[28px]">
                   Sync
                 </Button>
